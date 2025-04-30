@@ -14,6 +14,8 @@
 
 *When coding please make your own branch where you then push and fix any merge issues, I also RECOMMEND downloading "ES7+ React/Redux/React-Native snippets" extension for more efficient coding with react. EX: use rfc to create the header right away, and etc*
 
+*To enter your own git branch, enter in the terminal "git checkout *name of branch (preferablly your first name)"*
+
 ## Creating the Project
 
 ### Go to client for front end, in 'components' folder this is where you create components using react, such as navbar, login button, and etc.
