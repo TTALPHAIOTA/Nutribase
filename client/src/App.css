@@ -39,7 +39,7 @@
     overflow: hidden;
     border-bottom-left-radius: 1.5rem;
     border-bottom-right-radius: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.357);
   }
   
   /* Logo styles */
@@ -47,7 +47,7 @@
     position: absolute;
     top: 2rem;
     left: 2rem;
-    color: white;
+    color: rgb(255, 255, 255);
     display: flex;
     align-items: center;
   }
@@ -59,12 +59,11 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background-color: #1e293b;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: #1e293b00;
   }
   
   .logo-circle span {
-    font-size: 1.25rem;
+    font-size: 0.80rem;
     font-weight: 600;
   }
   
