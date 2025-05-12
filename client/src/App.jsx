@@ -1,8 +1,12 @@
-import React from 'react'
-import Food_Item from "./components/Food_Item";
+import "./App.css"
+import HomePage from "./HomePage"
 
-export default function App() {
+function App() {
   return (
-    <h1>a</h1>
+    <div className="app-container">
+      <HomePage />
+    </div>
   )
 }
+
+export default App
