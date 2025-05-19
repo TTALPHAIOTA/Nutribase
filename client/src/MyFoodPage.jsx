@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import "./shared-food-styles.css"
+import "./my-food-styles.css"
 
 // Custom icon components
 const HomeIcon = () => (
@@ -72,29 +72,13 @@ const UserIcon = () => (
   </svg>
 )
 
-export default function SharedFoodPage() {
+export default function MyFoodPage() {
   const navigate = useNavigate()
 
   // This could be fetched from an API in a real application
-  const [sharedItems] = useState([
+  const [myFoodItems] = useState([
     {
       id: 1,
-      image: "/placeholder.svg?height=80&width=80",
-      date: "26 Jan, 2025 11:39AM",
-      name: "Cobb Salad",
-      sharedBy: "Michelle",
-      profileImage: "/placeholder.svg?height=56&width=56",
-    },
-    {
-      id: 2,
-      image: "/placeholder.svg?height=80&width=80",
-      date: "24 Jan, 2025 11:05AM",
-      name: "Leftover Ramen",
-      sharedBy: "Emanuel",
-      profileImage: "/placeholder.svg?height=56&width=56",
-    },
-    {
-      id: 3,
       image: "/placeholder.svg?height=80&width=80",
       date: "25 Jan, 2025 1:39PM",
       name: "Yellow Onion",
@@ -102,7 +86,7 @@ export default function SharedFoodPage() {
       hasBorder: true,
     },
     {
-      id: 4,
+      id: 2,
       image: "/placeholder.svg?height=80&width=80",
       date: "25 Jan, 2025 1:43PM",
       name: "Ground Beef",
@@ -110,8 +94,8 @@ export default function SharedFoodPage() {
     },
   ])
 
-  const handleViewYourFridge = () => {
-    navigate("/myfood")
+  const handleViewSharedFridge = () => {
+    navigate("/sharedfood")
   }
 
   const handleNavigation = (path) => {
@@ -119,48 +103,43 @@ export default function SharedFoodPage() {
   }
 
   return (
-    <div className="shared-food-container">
+    <div className="my-food-container">
       {/* Main Content */}
-      <div className="shared-food-content">
-        <h1 className="shared-food-title">Shared Food</h1>
+      <div className="my-food-content">
+        <h1 className="my-food-title">My Food</h1>
 
         {/* Food Items List */}
-        <div className="food-list">
-          {sharedItems.map((item) => (
-            <div key={item.id} className="food-item">
-              <div className={`food-image ${item.hasBorder ? "food-image-bordered" : ""}`}>
+        <div className="my-food-list">
+          {myFoodItems.map((item) => (
+            <div key={item.id} className="my-food-item">
+              <div className={`my-food-image ${item.hasBorder ? "my-food-image-bordered" : ""}`}>
                 <img src={item.image || "/placeholder.svg"} alt={item.name} className="image" />
               </div>
-              <div className="food-details">
+              <div className="my-food-details">
                 <p className="date">{item.date}</p>
                 <p className="food-name">
-                  {item.name} {item.sharedBy ? `- ${item.sharedBy}` : item.quantity ? `- ${item.quantity}` : ""}
+                  {item.name} {item.quantity ? `- ${item.quantity}` : ""}
                 </p>
               </div>
-              {item.profileImage && (
-                <div className="profile-image">
-                  <img src={item.profileImage || "/placeholder.svg"} alt="Profile" className="image" />
-                </div>
-              )}
             </div>
           ))}
         </div>
 
-        {/* View Your Fridge Button */}
-        <button className="fridge-button" onClick={handleViewYourFridge}>
-          View Your Fridge
+        {/* View Shared Fridge Button */}
+        <button className="shared-fridge-button" onClick={handleViewSharedFridge}>
+          View Shared Fridge
         </button>
       </div>
 
       {/* Bottom Navigation */}
       <div className="bottom-nav">
-        <button className="nav-button" onClick={() => handleNavigation("/myfood")}>
+        <button className="nav-button nav-button-active" onClick={() => handleNavigation("/myfood")}>
           <HomeIcon />
         </button>
         <button className="nav-button" onClick={() => handleNavigation("/")}>
           <SearchIcon />
         </button>
-        <button className="nav-button nav-button-active" onClick={() => handleNavigation("/sharedfood")}>
+        <button className="nav-button" onClick={() => handleNavigation("/sharedfood")}>
           <BookmarkIcon />
         </button>
         <button className="nav-button" onClick={() => handleNavigation("/profile")}>

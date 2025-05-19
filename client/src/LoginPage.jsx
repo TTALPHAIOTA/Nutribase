@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "./signup-styles.css"
 
 export default function LoginPage() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     phoneNumber: "",
@@ -22,7 +23,9 @@ export default function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log("Login form submitted:", formData)
-    // Add your login logic here
+    // In a real app, you would validate credentials here
+    // For now, we'll just navigate to the my food page
+    navigate("/myfood")
   }
 
   return (
@@ -109,3 +112,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

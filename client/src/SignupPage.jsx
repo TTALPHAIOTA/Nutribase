@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "./signup-styles.css"
 
 export default function SignupPage() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -23,7 +24,9 @@ export default function SignupPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log("Form submitted:", formData)
-    // Add your form submission logic here
+    // In a real app, you would create the user account here
+    // For now, we'll just navigate to the my food page
+    navigate("/myfood")
   }
 
   return (
@@ -65,7 +68,7 @@ export default function SignupPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="••••••"
+                placeholder="••••��•"
                 className="form-input"
               />
               <button
@@ -122,3 +125,4 @@ export default function SignupPage() {
     </div>
   )
 }
+
