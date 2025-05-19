@@ -1,0 +1,49 @@
+/* Add these styles to your App.css or create a new CSS file and import it */
+
+/* Ensure the background color matches the screenshot */
+.bg-\[\#2D1B69\] {
+    background-color: #2d1b69;
+  }
+  
+  /* Input field styling to match the screenshot */
+  input {
+    background-color: #3d2a7d !important;
+    border-color: #4d3a8d !important;
+    color: white !important;
+  }
+  
+  input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+  }
+  
+  /* Button styling to match the screenshot */
+  .bg-\[\#8A6AE6\] {
+    background-color: #8a6ae6;
+  }
+  
+  .hover\:bg-\[\#7859D4\]:hover {
+    background-color: #7859d4;
+  }
+  
+  /* Rounded corners for inputs and buttons */
+  .rounded-lg {
+    border-radius: 0.5rem;
+  }
+  
+  /* Ensure proper spacing */
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+  
+  .space-y-2 > * + * {
+    margin-top: 0.5rem;
+  }
+  
+  /* Text colors */
+  .text-gray-300 {
+    color: #d1d5db;
+  }
+  
+  .text-gray-400 {
+    color: #9ca3af;
+  }  
