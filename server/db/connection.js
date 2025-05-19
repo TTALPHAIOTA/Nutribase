@@ -1,9 +1,9 @@
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-dotenv.config()
+dotenv.config();
 
-const uri = process.env.ATLAS_URI || "";
+const uri = process.env.ATLAS_URI;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -12,18 +12,28 @@ const client = new MongoClient(uri, {
   },
 });
 
-try {
-  // Connect the client to the server
-  await client.connect();
-  // Send a ping to confirm a successful connection
-  await client.db("admin").command({ ping: 1 });
-  console.log(
-   "Pinged your deployment. You successfully connected to MongoDB!"
-  );
-} catch(err) {
-  console.error(err);
+let db;
+
+async function connectDB() {
+  if (db) return db; // already connected
+
+  try {
+    await client.connect();
+    console.log("✅ Connected to MongoDB!");
+
+    db = client.db("employees");
+
+    const collections = await db.listCollections({ name: "accounts" }).toArray();
+    if (collections.length === 0) {
+      await db.createCollection("accounts");
+      await db.collection("accounts").createIndex({ username: 1 }, { unique: true });
+    }
+
+    return db;
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err);
+    throw err;
+  }
 }
 
-let db = client.db("employees");
-
-export default db;
+export default connectDB;
