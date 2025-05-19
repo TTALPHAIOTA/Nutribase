@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "./signup-styles.css"
 
 export default function LoginPage() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    phoneNumber: "",
+    name: "",
     password: "",
   })
 
@@ -19,10 +20,27 @@ export default function LoginPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Login form submitted:", formData)
-    // Add your login logic here
+    try {
+      const response = await fetch("http://localhost:5050/account/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.name, // backend expects "username"
+          password: formData.password,
+        }),
+      })
+      const data = await response.json()
+      if (response.ok) {
+        // Login successful, redirect or show success
+        navigate("/myfood")
+      } else {
+        alert(data.message || "Login failed")
+      }
+    } catch (err) {
+      alert("Error connecting to server")
+    }
   }
 
   return (
@@ -32,12 +50,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="signup-form">
           <div className="form-group">
-            <label htmlFor="phoneNumber">Phone Number</label>
+            <label htmlFor="name">Name</label>
             <input
-              type="tel"
-              id="phoneNumber"
-              name="phoneNumber"
-              value={formData.phoneNumber}
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
               className="form-input"
             />
@@ -109,3 +127,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

@@ -4,6 +4,8 @@ import SignupPage from "./SignupPage"
 import LoginPage from "./LoginPage"
 import ProfilePage from "./ProfilePage"
 import SettingsPage from "./SettingsPage"
+import SharedFoodPage from "./SharedFoodPage"
+import MyFoodPage from "./MyFoodPage"
 import "./App.css"
 
 function App() {
@@ -15,9 +17,13 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/sharedfood" element={<SharedFoodPage />} />
+        <Route path="/myfood" element={<MyFoodPage />} />
       </Routes>
     </div>
   )
 }
 
 export default App
+
+
