@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom"
 import HomePage from "./HomePage"
 import SignupPage from "./SignupPage"
 import LoginPage from "./LoginPage"
+import ProfilePage from "./ProfilePage"
+import SettingsPage from "./SettingsPage"
 import "./App.css"
 
 function App() {
@@ -11,6 +13,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </div>
   )
