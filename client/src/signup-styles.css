@@ -1,0 +1,158 @@
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Container styles */
+  .signup-container {
+    min-height: 100vh;
+    background-color: #2d1b69;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 24px;
+  }
+  
+  .signup-content {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 40px 0;
+  }
+  
+  /* Title styles */
+  .signup-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 40px;
+    line-height: 1.2;
+  }
+  
+  /* Form styles */
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-group label {
+    font-size: 16px;
+    font-weight: 400;
+    color: white;
+  }
+  
+  .form-input {
+    width: 100%;
+    height: 48px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0 16px;
+    font-size: 16px;
+    color: white;
+    transition: all 0.2s ease;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 2px rgba(138, 106, 230, 0.3);
+  }
+  
+  .form-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  /* Password input styles */
+  .password-input-container {
+    position: relative;
+  }
+  
+  .password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  
+  /* Continue button styles */
+  .continue-button {
+    width: 100%;
+    height: 48px;
+    background-color: #8a6ae6;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 8px;
+  }
+  
+  .continue-button:hover {
+    background-color: #7859d4;
+  }
+  
+  .continue-button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Login prompt styles */
+  .login-prompt {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+  }
+  
+  .login-prompt span {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .login-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  
+  .login-link span {
+    font-size: 20px;
+    font-weight: 600;
+    color: #8a6ae6;
+    margin-right: 8px;
+  }
+  
+  .arrow-icon {
+    transition: transform 0.2s ease;
+  }
+  
+  .login-link:hover .arrow-icon {
+    transform: translateX(4px);
+  }
+  
+  

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom"
+
 const LoginIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -60,16 +62,10 @@ const HomePage = () => {
 
           {/* Food images */}
           <div className="food-image cucumber-image">
-            <img
-              src="/images/cucumberreal.png"
-              alt="Cucumber slices"
-            />
+            <img src="/images/cucumberreal.png" alt="Cucumber slices" />
           </div>
           <div className="food-image lettuce-image">
-            <img
-              src="/images/lettuce.png"
-              alt="Lettuce leaves"
-            />
+            <img src="/images/lettuce.png" alt="Lettuce leaves" />
           </div>
         </div>
 
@@ -81,14 +77,20 @@ const HomePage = () => {
           </div>
 
           <div className="buttons">
-            <button className="login-button">
-              <LoginIcon />
-              Login
-            </button>
-            <button className="signup-button">
-              <UserPlusIcon />
-              Sign up
-            </button>
+            {/* Added Link component for navigation */}
+            <Link to="/login" style={{ textDecoration: "none", width: "100%" }}>
+              <button className="login-button">
+                <LoginIcon />
+                Login
+              </button>
+            </Link>
+            {/* Added Link component for navigation */}
+            <Link to="/signup" style={{ textDecoration: "none", width: "100%" }}>
+              <button className="signup-button">
+                <UserPlusIcon />
+                Sign up
+              </button>
+            </Link>
           </div>
         </div>
       </div>
