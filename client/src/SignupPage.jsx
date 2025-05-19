@@ -9,7 +9,6 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
-    phoneNumber: "",
     password: "",
   })
 
@@ -21,12 +20,27 @@ export default function SignupPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
-    // In a real app, you would create the user account here
-    // For now, we'll just navigate to the my food page
-    navigate("/myfood")
+    try {
+      const response = await fetch("http://localhost:5050/account/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.name, // backend expects "username"
+          password: formData.password,
+        }),
+      })
+      const data = await response.json()
+      if (response.ok) {
+        // Registration successful, redirect or show success
+        navigate("/login")
+      } else {
+        alert(data.message || "Registration failed")
+      }
+    } catch (err) {
+      alert("Error connecting to server")
+    }
   }
 
   return (
@@ -48,18 +62,6 @@ export default function SignupPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="phoneNumber">Phone Number</label>
-            <input
-              type="tel"
-              id="phoneNumber"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
             <label htmlFor="password">Password</label>
             <div className="password-input-container">
               <input
@@ -68,7 +70,7 @@ export default function SignupPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="••••��•"
+                placeholder="••••••"
                 className="form-input"
               />
               <button
