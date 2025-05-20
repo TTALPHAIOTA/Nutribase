@@ -1,0 +1,27 @@
+body.dark-mode {
+  background-color: #181824 !important;
+  color: #f4f4f6 !important;
+}
+
+body.dark-mode .profile-container,
+body.dark-mode .mobile-container {
+  background-color: #232336 !important;
+  color: #f4f4f6 !important;
+}
+
+body.dark-mode .profile-card {
+  background-color: #232336 !important;
+  color: #f4f4f6 !important;
+}
+
+body.dark-mode .profile-list-item,
+body.dark-mode .settings-item {
+  background-color: #232336 !important;
+  color: #f4f4f6 !important;
+}
+
+body.dark-mode .logout-btn {
+  background-color: #2d2a4a !important;
+  color: #ff6b6b !important;
+  border: 1px solid #3a375a !important;
+}

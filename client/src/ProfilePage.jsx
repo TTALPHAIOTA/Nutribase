@@ -17,7 +17,7 @@ export default function ProfilePage() {
   return (
     <div className="profile-container">
       <div className="header">
-        <span className="back-arrow" onClick={() => navigate("/")}>
+        <span className="back-arrow" onClick={() => navigate("/myfood")}>
           ←
         </span>
         <h2>Profile</h2>
@@ -42,17 +42,17 @@ export default function ProfilePage() {
           </span>{" "}
           Settings
         </button>
-        <button className="profile-list-item">
+        <button className="profile-list-item" onClick={() => navigate("/about")}>
           <span role="img" aria-label="about">
             ℹ️
           </span>{" "}
           About
         </button>
-        <button className="profile-list-item">
-          <span role="img" aria-label="help">
-            ❓
+        <button className="profile-list-item" onClick={() => navigate("/sharedfood")}>
+          <span role="img" aria-label="group">
+            👥
           </span>{" "}
-          Help
+          Shared Group
         </button>
       </div>
 

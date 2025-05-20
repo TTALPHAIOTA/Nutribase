@@ -1,4 +1,5 @@
 "use client"
+import "./MyFoodPage.css"
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -86,6 +87,40 @@ export default function MyFoodPage() {
     navigate(path)
   }
 
+  const handleAddFood = async () => {
+    const name = prompt("Enter the name of the food item:")
+    if (!name) return
+
+    // Simulate hardware scale reading (replace with real hardware integration)
+    alert("Please place the food item on the scale and press OK when ready.")
+    // For now, prompt for weight
+    const weight = prompt("Enter the measured weight in lbs (e.g., 0.25):")
+    if (!weight) return
+
+    const food = {
+      name,
+      dateAdded: new Date().toISOString(),
+      addedBy: username,
+      weight,
+    }
+
+    try {
+      const res = await fetch("http://localhost:5050/account/add-food", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, food }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setMyFoodItems((prev) => [...prev, food])
+      } else {
+        alert(data.message || "Failed to add food")
+      }
+    } catch (err) {
+      alert("Error connecting to server")
+    }
+  }
+
   return (
     <div className="my-food-container">
       {/* Main Content */}
@@ -125,6 +160,11 @@ export default function MyFoodPage() {
         {/* View Shared Fridge Button */}
         <button className="shared-fridge-button" onClick={handleViewSharedFridge}>
           View Shared Fridge
+        </button>
+
+        {/* Add Food Button */}
+        <button className="add-food-button" onClick={handleAddFood}>
+          + Add Food
         </button>
       </div>
 

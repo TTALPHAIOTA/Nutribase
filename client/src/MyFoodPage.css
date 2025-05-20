@@ -1,0 +1,14 @@
+.add-food-button {
+  width: 100%;
+  background-color: #8a6ae6;
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+}
+.add-food-button:hover {
+  background-color: #7859d4;
+}
