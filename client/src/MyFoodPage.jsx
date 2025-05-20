@@ -22,23 +22,6 @@ const HomeIcon = () => (
   </svg>
 )
 
-const SearchIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <path d="m21 21-4.3-4.3" />
-  </svg>
-)
-
 const BookmarkIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -135,9 +118,6 @@ export default function MyFoodPage() {
       <div className="bottom-nav">
         <button className="nav-button nav-button-active" onClick={() => handleNavigation("/myfood")}>
           <HomeIcon />
-        </button>
-        <button className="nav-button" onClick={() => handleNavigation("/")}>
-          <SearchIcon />
         </button>
         <button className="nav-button" onClick={() => handleNavigation("/sharedfood")}>
           <BookmarkIcon />
