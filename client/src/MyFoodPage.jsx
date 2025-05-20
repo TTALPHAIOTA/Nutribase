@@ -58,52 +58,36 @@ export default function MyFoodPage() {
     navigate(path)
   }
 
-<<<<<<< Updated upstream
   const handleAddFood = async () => {
-    const name = prompt("Enter the name of the food item:")
-    if (!name) return
+    if (!newFood.name || !newFood.dateAdded) return
+    const username = localStorage.getItem("username") || "Emanuel" // Use real username
 
-    // Simulate hardware scale reading (replace with real hardware integration)
-    alert("Please place the food item on the scale and press OK when ready.")
-    // For now, prompt for weight
-    const weight = prompt("Enter the measured weight in lbs (e.g., 0.25):")
-    if (!weight) return
-
-    const food = {
-      name,
-      dateAdded: new Date().toISOString(),
-      addedBy: username,
-      weight,
-    }
-
+    // Send to backend
     try {
       const res = await fetch("http://localhost:5050/account/add-food", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, food }),
+        body: JSON.stringify({
+          username,
+          food: newFood,
+        }),
       })
-      const data = await res.json()
       if (res.ok) {
-        setMyFoodItems((prev) => [...prev, food])
+        const updated = [...myFoodItems, newFood]
+        setMyFoodItems(updated)
+        setNewFood({ name: "", dateAdded: "" })
+        setShowAddForm(false)
       } else {
-        alert(data.message || "Failed to add food")
+        alert("Failed to add food")
       }
-    } catch (err) {
-      alert("Error connecting to server")
+    } catch {
+      alert("Error adding food")
     }
-=======
-  const handleAddFood = () => {
-    if (!newFood.name || !newFood.dateAdded) return
-    const updated = [...myFoodItems, newFood]
-    setMyFoodItems(updated)
-    setNewFood({ name: "", dateAdded: "" })
-    setShowAddForm(false)
   }
 
   const handleDeleteFood = (indexToRemove) => {
     const updated = myFoodItems.filter((_, idx) => idx !== indexToRemove)
     setMyFoodItems(updated)
->>>>>>> Stashed changes
   }
 
   return (
@@ -150,12 +134,6 @@ export default function MyFoodPage() {
           View Shared Fridge
         </button>
 
-<<<<<<< Updated upstream
-        {/* Add Food Button */}
-        <button className="add-food-button" onClick={handleAddFood}>
-          + Add Food
-        </button>
-=======
         <button className="add-food-button" onClick={() => setShowAddForm(true)}>
           + Add Food
         </button>
@@ -179,7 +157,6 @@ export default function MyFoodPage() {
             </div>
           </div>
         )}
->>>>>>> Stashed changes
       </div>
 
       <div className="bottom-nav">

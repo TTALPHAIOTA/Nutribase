@@ -23,25 +23,24 @@ export default function SharedGroupPage() {
   }, [username])
 
   const handleInvite = async (e) => {
-    e.preventDefault()
-    if (!inviteUser) return
-    setMessage("")
+    e.preventDefault();
+    if (!inviteUser) return;
+    setMessage("");
     try {
-      const res = await fetch("http://localhost:5050/account/add-to-group", {
+      const res = await fetch("http://localhost:5050/account/invite-to-group", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, member: inviteUser }),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (res.ok) {
-        setMessage("Invite sent!")
-        setGroup((prev) => [...prev, inviteUser])
-        setInviteUser("")
+        setMessage("Invite sent!");
+        setInviteUser("");
       } else {
-        setMessage(data.message || "Failed to send invite")
+        setMessage(data.message || "Failed to send invite");
       }
     } catch {
-      setMessage("Error sending invite")
+      setMessage("Error sending invite");
     }
   }
 

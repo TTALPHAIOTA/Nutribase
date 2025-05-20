@@ -9,7 +9,7 @@ export default function SharedFoodPage() {
   const [sharedItems, setSharedItems] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const username = "Emanuel"
+  const username = localStorage.getItem("username") || ""
 
   useEffect(() => {
     async function fetchSharedFoods() {
