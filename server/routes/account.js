@@ -25,7 +25,9 @@ router.post("/register", async (req, res) => {
     const newUser = {
       username: req.body.username,
       password: hashedPassword,
-      createdAt: new Date()
+      createdAt: new Date(),
+      foods: [],
+      group: []
     };
     
     // Insert the user into database
@@ -46,27 +48,76 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const collection = db.collection("users");
-    
-    // Find user by username
     const user = await collection.findOne({ username: req.body.username });
     if (!user) {
-      return res.status(401).send("Invalid username or password");
+      return res.status(401).json({ message: "Invalid username or password" });
     }
-    
-    // Compare password
     const passwordMatch = await bcrypt.compare(req.body.password, user.password);
     if (!passwordMatch) {
-      return res.status(401).send("Invalid username or password");
+      return res.status(401).json({ message: "Invalid username or password" });
     }
-    
-    // Return success (in a real app, you would generate a token here)
-    res.status(200).send({
+    res.status(200).json({
       message: "Login successful",
       userId: user._id
     });
   } catch (err) {
     console.error("Error during login:", err);
-    res.status(500).send("Error during login");
+    res.status(500).json({ message: "Error during login" });
+  }
+});
+
+// Add food to user's list
+router.post("/add-food", async (req, res) => {
+  try {
+    const { username, food } = req.body;
+    const collection = db.collection("users");
+    const result = await collection.updateOne(
+      { username },
+      { $push: { foods: food } }
+    );
+    if (result.modifiedCount === 1) {
+      res.status(200).json({ message: "Food added" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Error adding food" });
+  }
+});
+
+// Add user to group
+router.post("/add-to-group", async (req, res) => {
+  try {
+    const { username, member } = req.body; // username = group owner, member = user to add
+    const collection = db.collection("users");
+    const result = await collection.updateOne(
+      { username },
+      { $addToSet: { group: member } }
+    );
+    if (result.modifiedCount === 1) {
+      res.status(200).json({ message: "User added to group" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Error adding to group" });
+  }
+});
+
+// Get user data (foods and group)
+router.get("/user/:username", async (req, res) => {
+  try {
+    const collection = db.collection("users");
+    const user = await collection.findOne(
+      { username: req.params.username },
+      { projection: { password: 0 } } // Don't return password
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching user data" });
   }
 });
 
