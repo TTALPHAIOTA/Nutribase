@@ -5,52 +5,22 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "./my-food-styles.css"
 
-// Custom icon components
+// Icon Components
 const HomeIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
     <polyline points="9 22 9 12 15 12 15 22" />
   </svg>
 )
 
 const BookmarkIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
   </svg>
 )
 
 const UserIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
     <circle cx="12" cy="7" r="4" />
   </svg>
@@ -60,8 +30,9 @@ export default function MyFoodPage() {
   const navigate = useNavigate()
   const [myFoodItems, setMyFoodItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newFood, setNewFood] = useState({ name: "", dateAdded: "" })
 
-  // TODO: Replace with real logged-in username (e.g. from context or localStorage)
   const username = "Emanuel"
 
   useEffect(() => {
@@ -87,6 +58,7 @@ export default function MyFoodPage() {
     navigate(path)
   }
 
+<<<<<<< Updated upstream
   const handleAddFood = async () => {
     const name = prompt("Enter the name of the food item:")
     if (!name) return
@@ -119,13 +91,26 @@ export default function MyFoodPage() {
     } catch (err) {
       alert("Error connecting to server")
     }
+=======
+  const handleAddFood = () => {
+    if (!newFood.name || !newFood.dateAdded) return
+    const updated = [...myFoodItems, newFood]
+    setMyFoodItems(updated)
+    setNewFood({ name: "", dateAdded: "" })
+    setShowAddForm(false)
+  }
+
+  const handleDeleteFood = (indexToRemove) => {
+    const updated = myFoodItems.filter((_, idx) => idx !== indexToRemove)
+    setMyFoodItems(updated)
+>>>>>>> Stashed changes
   }
 
   return (
     <div className="my-food-container">
-      {/* Main Content */}
       <div className="my-food-content">
         <h1 className="my-food-title">My Food</h1>
+
         {loading ? (
           <div>Loading...</div>
         ) : (
@@ -133,7 +118,6 @@ export default function MyFoodPage() {
             {myFoodItems.map((item, idx) => (
               <div key={idx} className="my-food-item">
                 <div className="my-food-image my-food-image-bordered">
-                  {/* Optionally use item.image if you store images */}
                   <img src="/placeholder.svg" alt={item.name} className="image" />
                 </div>
                 <div className="my-food-details">
@@ -148,27 +132,56 @@ export default function MyFoodPage() {
                         })
                       : ""}
                   </p>
-                  <p className="food-name">
-                    {item.name} {item.weight ? `- ${item.weight}` : ""}
-                  </p>
+                  <p className="food-name">{item.name}</p>
                 </div>
+                <button
+                  className="delete-food-button"
+                  onClick={() => handleDeleteFood(idx)}
+                  aria-label={`Remove ${item.name}`}
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>
         )}
 
-        {/* View Shared Fridge Button */}
         <button className="shared-fridge-button" onClick={handleViewSharedFridge}>
           View Shared Fridge
         </button>
 
+<<<<<<< Updated upstream
         {/* Add Food Button */}
         <button className="add-food-button" onClick={handleAddFood}>
           + Add Food
         </button>
+=======
+        <button className="add-food-button" onClick={() => setShowAddForm(true)}>
+          + Add Food
+        </button>
+
+        {showAddForm && (
+          <div className="add-food-form">
+            <input
+              type="text"
+              placeholder="Food name"
+              value={newFood.name}
+              onChange={(e) => setNewFood({ ...newFood, name: e.target.value })}
+            />
+            <input
+              type="datetime-local"
+              value={newFood.dateAdded}
+              onChange={(e) => setNewFood({ ...newFood, dateAdded: e.target.value })}
+            />
+            <div className="form-actions">
+              <button onClick={handleAddFood}>Add</button>
+              <button className="cancel-btn" onClick={() => setShowAddForm(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
+>>>>>>> Stashed changes
       </div>
 
-      {/* Bottom Navigation */}
       <div className="bottom-nav">
         <button className="nav-button nav-button-active" onClick={() => handleNavigation("/myfood")}>
           <HomeIcon />
@@ -183,4 +196,3 @@ export default function MyFoodPage() {
     </div>
   )
 }
-

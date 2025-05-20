@@ -127,5 +127,22 @@
     border: none;
     cursor: pointer;
   }
+
+  .delete-food-button {
+    background: none;
+    border: none;
+    color: var(--color-medium-gray);
+    font-size: 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0 8px;
+    margin-left: auto;
+    transition: color 0.2s ease;
+  }
+  
+  .delete-food-button:hover {
+    color: #ff4d4f;
+  }
+  
   
   
