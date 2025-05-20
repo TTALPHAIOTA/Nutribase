@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "./my-food-styles.css"
 
@@ -57,25 +57,26 @@ const UserIcon = () => (
 
 export default function MyFoodPage() {
   const navigate = useNavigate()
+  const [myFoodItems, setMyFoodItems] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // This could be fetched from an API in a real application
-  const [myFoodItems] = useState([
-    {
-      id: 1,
-      image: "/placeholder.svg?height=80&width=80",
-      date: "25 Jan, 2025 1:39PM",
-      name: "Yellow Onion",
-      quantity: "0.13 lbs",
-      hasBorder: true,
-    },
-    {
-      id: 2,
-      image: "/placeholder.svg?height=80&width=80",
-      date: "25 Jan, 2025 1:43PM",
-      name: "Ground Beef",
-      quantity: "0.67 lbs",
-    },
-  ])
+  // TODO: Replace with real logged-in username (e.g. from context or localStorage)
+  const username = "Emanuel"
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch(`http://localhost:5050/account/user/${username}`)
+        const data = await res.json()
+        setMyFoodItems(data.foods || [])
+      } catch (err) {
+        setMyFoodItems([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [username])
 
   const handleViewSharedFridge = () => {
     navigate("/sharedfood")
@@ -90,23 +91,36 @@ export default function MyFoodPage() {
       {/* Main Content */}
       <div className="my-food-content">
         <h1 className="my-food-title">My Food</h1>
-
-        {/* Food Items List */}
-        <div className="my-food-list">
-          {myFoodItems.map((item) => (
-            <div key={item.id} className="my-food-item">
-              <div className={`my-food-image ${item.hasBorder ? "my-food-image-bordered" : ""}`}>
-                <img src={item.image || "/placeholder.svg"} alt={item.name} className="image" />
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <div className="my-food-list">
+            {myFoodItems.map((item, idx) => (
+              <div key={idx} className="my-food-item">
+                <div className="my-food-image my-food-image-bordered">
+                  {/* Optionally use item.image if you store images */}
+                  <img src="/placeholder.svg" alt={item.name} className="image" />
+                </div>
+                <div className="my-food-details">
+                  <p className="date">
+                    {item.dateAdded
+                      ? new Date(item.dateAdded).toLocaleString("en-US", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : ""}
+                  </p>
+                  <p className="food-name">
+                    {item.name} {item.weight ? `- ${item.weight}` : ""}
+                  </p>
+                </div>
               </div>
-              <div className="my-food-details">
-                <p className="date">{item.date}</p>
-                <p className="food-name">
-                  {item.name} {item.quantity ? `- ${item.quantity}` : ""}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* View Shared Fridge Button */}
         <button className="shared-fridge-button" onClick={handleViewSharedFridge}>

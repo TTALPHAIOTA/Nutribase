@@ -2,9 +2,17 @@
 
 import { useNavigate } from "react-router-dom"
 import "./ProfilePage.css"
+import { useEffect, useState } from "react"
 
 export default function ProfilePage() {
   const navigate = useNavigate()
+  const [username, setUsername] = useState("")
+
+  useEffect(() => {
+    // Get username from localStorage
+    const storedUsername = localStorage.getItem("username")
+    setUsername(storedUsername || "")
+  }, [])
 
   return (
     <div className="profile-container">
@@ -17,13 +25,13 @@ export default function ProfilePage() {
 
       <div className="profile-card">
         <img
-          src="/images/profile.jpg" // Replace with your image path
+          src="/images/profile.jpg"
           alt="Profile"
           className="profile-avatar"
         />
         <div>
-          <div className="profile-name">Ganesh Kumarappan</div>
-          <div className="profile-id">ID: 12025550161</div>
+          <div className="profile-name">{username}</div>
+          {/* ID line removed */}
         </div>
       </div>
 
@@ -48,7 +56,12 @@ export default function ProfilePage() {
         </button>
       </div>
 
-      <button className="logout-btn">Logout</button>
+      <button className="logout-btn" onClick={() => {
+        localStorage.removeItem("username")
+        navigate("/login")
+      }}>
+        Logout
+      </button>
     </div>
   )
 }

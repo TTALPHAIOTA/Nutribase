@@ -34,6 +34,7 @@ export default function LoginPage() {
       const data = await response.json()
       if (response.ok) {
         // Login successful, redirect or show success
+        localStorage.setItem("username", formData.name)
         navigate("/myfood")
       } else {
         alert(data.message || "Login failed")
