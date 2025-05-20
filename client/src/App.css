@@ -121,8 +121,8 @@ body {
 }
 
 .cucumber-image {
-  bottom: -5%;
-  left: -5%;
+  bottom: 5%;
+  left: 2%;
   transform: rotate(12deg);
 }
 

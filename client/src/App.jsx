@@ -7,6 +7,7 @@ import SettingsPage from "./SettingsPage"
 import SharedFoodPage from "./SharedFoodPage"
 import MyFoodPage from "./MyFoodPage"
 import AboutPage from "./AboutPage"
+import UserManagement from "./UserManagement"
 import "./App.css"
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/sharedfood" element={<SharedFoodPage />} />
         <Route path="/myfood" element={<MyFoodPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/usermanagement" element={<UserManagement />} />
       </Routes>
     </div>
   )
