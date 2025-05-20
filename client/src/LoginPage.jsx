@@ -70,7 +70,6 @@ export default function LoginPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="••••••"
                 className="form-input"
               />
               <button

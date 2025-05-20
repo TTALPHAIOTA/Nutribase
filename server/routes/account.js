@@ -46,27 +46,21 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const collection = db.collection("users");
-    
-    // Find user by username
     const user = await collection.findOne({ username: req.body.username });
     if (!user) {
-      return res.status(401).send("Invalid username or password");
+      return res.status(401).json({ message: "Invalid username or password" });
     }
-    
-    // Compare password
     const passwordMatch = await bcrypt.compare(req.body.password, user.password);
     if (!passwordMatch) {
-      return res.status(401).send("Invalid username or password");
+      return res.status(401).json({ message: "Invalid username or password" });
     }
-    
-    // Return success (in a real app, you would generate a token here)
-    res.status(200).send({
+    res.status(200).json({
       message: "Login successful",
       userId: user._id
     });
   } catch (err) {
     console.error("Error during login:", err);
-    res.status(500).send("Error during login");
+    res.status(500).json({ message: "Error during login" });
   }
 });
 
