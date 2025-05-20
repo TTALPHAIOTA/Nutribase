@@ -1,0 +1,126 @@
+:root {
+  --color-white: #ffffff;
+  --color-dark: #2f313e;
+  --color-light-gray: #f4f4f6;
+  --color-medium-gray: #81838f;
+  --color-border-gray: #f3f3f3;
+  --color-icon-gray: #c0bfc7;
+  --color-purple: #8c63ee;
+  --color-purple-light: rgba(140, 99, 238, 0.1);
+}
+
+.my-food-container {
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: var(--color-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Main Content */
+.my-food-content {
+  flex: 1;
+  padding: 24px 24px 80px 24px;
+}
+
+.my-food-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 32px;
+}
+
+/* Food List */
+.my-food-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.my-food-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.my-food-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.my-food-image-bordered {
+  border: 1px solid var(--color-border-gray);
+}
+
+.image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.my-food-details {
+  flex: 1;
+}
+
+.date {
+  font-size: 0.875rem;
+  color: var(--color-medium-gray);
+  margin-bottom: 4px;
+}
+
+.food-name {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-dark);
+}
+
+/* Shared Fridge Button */
+.shared-fridge-button {
+  width: 100%;
+  background-color: var(--color-purple-light);
+  color: var(--color-purple);
+  padding: 16px;
+  border-radius: 16px;
+  margin-top: 40px;
+  font-weight: 500;
+  font-size: 1.125rem;
+  border: none;
+  cursor: pointer;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--color-white);
+  border-top: 1px solid var(--color-light-gray);
+  display: flex;
+  justify-content: space-around;
+  padding: 16px 0;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-icon-gray);
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex: 1;
+}
+
+.nav-button-active {
+  color: var(--color-purple);
+}
