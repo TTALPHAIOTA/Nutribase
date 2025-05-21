@@ -132,9 +132,28 @@ export default function MyFoodPage() {
     }
   }
 
-  const handleDeleteFood = (indexToRemove) => {
-    const updated = myFoodItems.filter((_, idx) => idx !== indexToRemove)
-    setMyFoodItems(updated)
+  const handleDeleteFood = async (indexToRemove) => {
+    const foodToDelete = myFoodItems[indexToRemove]
+    if (!foodToDelete) return
+    try {
+      const res = await fetch("http://localhost:5050/account/delete-food", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          foodName: foodToDelete.name,
+          dateAdded: foodToDelete.dateAdded,
+        }),
+      })
+      if (res.ok) {
+        const updated = myFoodItems.filter((_, idx) => idx !== indexToRemove)
+        setMyFoodItems(updated)
+      } else {
+        alert("Failed to delete food item")
+      }
+    } catch {
+      alert("Error deleting food item")
+    }
   }
 
   return (

@@ -305,4 +305,22 @@ router.get("/food-photo/:username/:foodName", async (req, res) => {
   res.send(food.photo.buffer ? food.photo.buffer : food.photo)
 })
 
+// Delete food from user's list
+router.post("/delete-food", async (req, res) => {
+  const { username, foodName, dateAdded } = req.body;
+  if (!username || !foodName || !dateAdded) {
+    return res.status(400).json({ message: "Missing username, foodName, or dateAdded" });
+  }
+  const collection = db.collection("users");
+  const result = await collection.updateOne(
+    { username },
+    { $pull: { foods: { name: foodName, dateAdded: dateAdded } } }
+  );
+  if (result.modifiedCount === 1) {
+    res.status(200).json({ message: "Food deleted" });
+  } else {
+    res.status(404).json({ message: "Food not found" });
+  }
+});
+
 export default router;
