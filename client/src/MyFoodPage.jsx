@@ -45,8 +45,8 @@ export default function MyFoodPage() {
   const [showPhotoUpload, setShowPhotoUpload] = useState(false)
   const [photoFoodName, setPhotoFoodName] = useState("")
   const [photoFile, setPhotoFile] = useState(null)
+  const [pendingFood, setPendingFood] = useState(null) // NEW
 
-  // Use the logged-in username from localStorage
   const username = localStorage.getItem("username") || ""
 
   useEffect(() => {
@@ -72,64 +72,70 @@ export default function MyFoodPage() {
     navigate(path)
   }
 
-  const handleAddFood = async () => {
+  // Step 1: User clicks "Add" on food form
+  const handleAddFood = () => {
     if (!newFood.name || !newFood.dateAdded) return
-    const username = localStorage.getItem("username") || "Emanuel" // Use real username
+    setPendingFood(newFood)
+    setPhotoFoodName(newFood.name)
+    setShowAddForm(false)
+    setShowPhotoUpload(true)
+  }
 
-    // Send to backend
+  // Step 2: User uploads photo or skips
+  const handlePhotoChange = (e) => {
+    setPhotoFile(e.target.files[0])
+  }
+
+  // Step 3: Upload photo (if any) and add food to DB
+  const handleUploadPhoto = async () => {
+    let photoUploaded = false
+    if (photoFile && pendingFood) {
+      const formData = new FormData()
+      formData.append("username", username)
+      formData.append("foodName", pendingFood.name)
+      formData.append("photo", photoFile)
+      try {
+        const res = await fetch("http://localhost:5050/account/upload-food-photo", {
+          method: "POST",
+          body: formData,
+        })
+        photoUploaded = res.ok
+      } catch {}
+    }
+    await actuallyAddFoodToDB()
+  }
+
+  // Step 4: Skip photo
+  const handleSkipPhoto = async () => {
+    await actuallyAddFoodToDB()
+  }
+
+  // Step 5: Actually add food to DB (after photo step)
+  const actuallyAddFoodToDB = async () => {
+    if (!pendingFood) return
     try {
       const res = await fetch("http://localhost:5050/account/add-food", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username,
-          food: newFood,
+          food: pendingFood,
         }),
       })
       if (res.ok) {
-        const updated = [...myFoodItems, newFood]
+        const updated = [...myFoodItems, pendingFood]
         setMyFoodItems(updated)
         setNewFood({ name: "", dateAdded: "" })
-        setShowAddForm(false)
-        setPhotoFoodName(newFood.name)
-        setShowPhotoUpload(true)
       } else {
         alert("Failed to add food")
       }
     } catch {
       alert("Error adding food")
     }
-  }
-
-  const handlePhotoChange = (e) => {
-    setPhotoFile(e.target.files[0])
-  }
-
-  const handleUploadPhoto = async () => {
-    if (!photoFile || !photoFoodName) return
-    const formData = new FormData()
-    formData.append("username", username)
-    formData.append("foodName", photoFoodName)
-    formData.append("photo", photoFile)
-    try {
-      const res = await fetch("http://localhost:5050/account/upload-food-photo", {
-        method: "POST",
-        body: formData,
-      })
-      if (res.ok) {
-        setShowPhotoUpload(false)
-        setPhotoFile(null)
-        setPhotoFoodName("")
-        // Optionally, refresh food list to show photo
-        const updatedRes = await fetch(`http://localhost:5050/account/user/${username}`)
-        const updatedData = await updatedRes.json()
-        setMyFoodItems(updatedData.foods || [])
-      } else {
-        alert("Failed to upload photo")
-      }
-    } catch {
-      alert("Error uploading photo")
-    }
+    setShowPhotoUpload(false)
+    setPhotoFile(null)
+    setPhotoFoodName("")
+    setPendingFood(null)
   }
 
   const handleDeleteFood = async (indexToRemove) => {
@@ -236,11 +242,17 @@ export default function MyFoodPage() {
 
         {showPhotoUpload && (
           <div className="add-food-form">
-            <label style={{ marginBottom: 8 }}>Upload a photo for <b>{photoFoodName}</b>:</label>
+            <label style={{ marginBottom: 8 }}>
+              Upload a photo for <b>{photoFoodName}</b>:
+            </label>
             <input type="file" accept="image/*" onChange={handlePhotoChange} />
             <div className="form-actions">
-              <button onClick={handleUploadPhoto} disabled={!photoFile}>Upload Photo</button>
-              <button className="cancel-btn" onClick={() => setShowPhotoUpload(false)}>Skip</button>
+              <button onClick={handleUploadPhoto} disabled={!pendingFood}>
+                Upload Photo
+              </button>
+              <button className="cancel-btn" onClick={handleSkipPhoto}>
+                Skip
+              </button>
             </div>
           </div>
         )}
