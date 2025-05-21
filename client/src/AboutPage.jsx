@@ -20,6 +20,15 @@ const UserIcon = () => (
   </svg>
 )
 
+const GroupIcon = ({ active }) => (
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={active ? "#222" : "#c0bfc7"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="10" r="3"/>
+    <circle cx="6.5" cy="12.5" r="2.5"/>
+    <circle cx="17.5" cy="12.5" r="2.5"/>
+    <path d="M2 20c0-2.5 4-4 10-4s10 1.5 10 4"/>
+  </svg>
+)
+
 export default function AboutPage() {
   const navigate = useNavigate()
   return (

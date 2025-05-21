@@ -2,8 +2,11 @@
 import express from "express";
 import bcrypt from "bcrypt"; // You'll need to install this package
 import db from "../db/connection.js";
+import multer from "multer";
+import { Binary } from "mongodb";
 
 const router = express.Router();
+const upload = multer();
 
 // Register a new user
 router.post("/register", async (req, res) => {
@@ -267,5 +270,39 @@ router.post("/invite-to-group", async (req, res) => {
   // You can also notify the inviter that the invite was sent
   res.json({ message: "Invitation sent" });
 });
+
+// Upload food photo (store in MongoDB as Buffer)
+router.post("/upload-food-photo", upload.single("photo"), async (req, res) => {
+  const { username, foodName } = req.body
+  const photoBuffer = req.file?.buffer
+  if (!username || !foodName || !photoBuffer) {
+    return res.status(400).json({ message: "Missing data" })
+  }
+  const collection = db.collection("users")
+  // Store as MongoDB Binary
+  await collection.updateOne(
+    { username, "foods.name": foodName },
+    {
+      $set: {
+        "foods.$.photo": new Binary(photoBuffer),
+        "foods.$.photoUrl": `/account/food-photo/${username}/${encodeURIComponent(foodName)}`
+      }
+    }
+  )
+  res.json({ message: "Photo uploaded" })
+})
+
+// Serve food photo from MongoDB
+router.get("/food-photo/:username/:foodName", async (req, res) => {
+  const { username, foodName } = req.params
+  const collection = db.collection("users")
+  const user = await collection.findOne({ username })
+  if (!user || !user.foods) return res.status(404).send("Not found")
+  const food = user.foods.find(f => f.name === foodName)
+  if (!food || !food.photo) return res.status(404).send("No photo")
+  res.set("Content-Type", "image/jpeg")
+  // Support both Binary and Buffer
+  res.send(food.photo.buffer ? food.photo.buffer : food.photo)
+})
 
 export default router;

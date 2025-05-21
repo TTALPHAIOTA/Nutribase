@@ -63,6 +63,15 @@ export default function SharedGroupPage() {
     </svg>
   )
 
+  const GroupIcon = ({ active }) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={active ? "#8a6ae6" : "#c0bfc7"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', margin: '0 auto' }}>
+      <circle cx="12" cy="10" r="3"/>
+      <circle cx="6.5" cy="12.5" r="2.5"/>
+      <circle cx="17.5" cy="12.5" r="2.5"/>
+      <path d="M2 20c0-2.5 4-4 10-4s10 1.5 10 4"/>
+    </svg>
+  )
+
   return (
     <div className="profile-container">
       <div className="header">
@@ -138,7 +147,7 @@ export default function SharedGroupPage() {
       </div>
       <div className="bottom-nav">
         <button className="nav-button" onClick={() => navigate("/myfood")}> <HomeIcon /> </button>
-        <button className="nav-button nav-button-active" onClick={() => navigate("/sharedfood")}> <BookmarkIcon /> </button>
+        <button className="nav-button nav-button-active" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }} onClick={() => navigate("/sharedfood")}> <GroupIcon active={true} /> </button>
         <button className="nav-button" onClick={() => navigate("/profile")}> <UserIcon /> </button>
       </div>
     </div>
