@@ -174,7 +174,8 @@ export default function MyFoodPage() {
             <div style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', color: '#c0bfc7', textAlign: 'center'
             }}>
-              <img src="/images/no-food-illustration.svg" alt="No Food" style={{ width: 180, marginBottom: 32, opacity: 0.15 }} />
+              {/* Remove or comment out the image below */}
+              {/* <img src="/images/no-food-illustration.svg" alt="No Food" style={{ width: 180, marginBottom: 32, opacity: 0.15 }} /> */}
               <h2 style={{ fontWeight: 600, fontSize: 32, margin: 0, color: '#b0aeb8' }}>No Food</h2>
               <div style={{ fontSize: 18, marginTop: 8, color: '#c0bfc7' }}>You don't have any food items yet</div>
             </div>
