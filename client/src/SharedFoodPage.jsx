@@ -89,6 +89,29 @@ export default function SharedFoodPage() {
         ) : (
           <div className="food-list">
             {sharedItems.map((item, idx) => (
+              // <div key={idx} className="my-food-item">
+              //   <div className="my-food-image my-food-image-bordered">
+              //     {/* Optionally use item.image if you store images */}
+              //     <img src="/placeholder.svg" alt={item.name} className="image" />
+              //   </div>
+              //   <div className="my-food-details">
+              //     <p className="date">
+              //       {item.dateAdded
+              //         ? new Date(item.dateAdded).toLocaleString("en-US", {
+              //             day: "2-digit",
+              //             month: "short",
+              //             year: "numeric",
+              //             hour: "2-digit",
+              //             minute: "2-digit",
+              //           })
+              //         : ""}
+              //     </p>
+              //     <p className="food-name">
+              //       {item.name} {item.weight ? `- ${item.weight}` : ""}
+              //     </p>
+              //   </div>
+              // </div>
+              
               <div key={idx} className="food-item">
                 <div className="food-image food-image-bordered">
                   <img src="/placeholder.svg" alt={item.name} className="image" />
