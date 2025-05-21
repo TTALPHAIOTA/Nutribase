@@ -4,7 +4,7 @@ import "./ProfilePage.css"
 
 export default function SharedGroupPage() {
   const navigate = useNavigate()
-  const [group, setGroup] = useState([])
+  const [group, setGroup] = useState(null)
   const [inviteUser, setInviteUser] = useState("")
   const [message, setMessage] = useState("")
   const username = localStorage.getItem("username") || ""
@@ -14,9 +14,9 @@ export default function SharedGroupPage() {
       try {
         const res = await fetch(`http://localhost:5050/account/user/${username}`)
         const data = await res.json()
-        setGroup(data.group || [])
+        setGroup(data.group || null)
       } catch {
-        setGroup([])
+        setGroup(null)
       }
     }
     fetchGroup()
@@ -53,14 +53,27 @@ export default function SharedGroupPage() {
         <h2>Shared Group</h2>
       </div>
       <div style={{ padding: "24px 0" }}>
-        {group.length === 0 ? (
+        {!group ? (
           <div style={{ color: "#888", marginBottom: 24 }}>You are in no group.</div>
         ) : (
           <div style={{ marginBottom: 24 }}>
             <b>Group Members:</b>
-            <ul style={{ marginTop: 8 }}>
-              {group.map((member, idx) => (
-                <li key={idx} style={{ margin: "6px 0" }}>{member}</li>
+            <ul style={{ marginTop: 8, padding: 0, listStyle: "none" }}>
+              {group.members && group.members.map((member, idx) => (
+                <li key={idx} style={{ display: "flex", alignItems: "center", margin: "12px 0" }}>
+                  {/* Placeholder avatar */}
+                  <div style={{
+                    width: 36, height: 36, borderRadius: "50%", background: "#e0e0e0",
+                    display: "flex", alignItems: "center", justifyContent: "center", marginRight: 12, fontWeight: 600, fontSize: 18
+                  }}>
+                    {member.username[0]?.toUpperCase()}
+                  </div>
+                  <div>
+                    <span style={{ fontWeight: 500 }}>{member.username}</span>
+                    {member.role === "owner" && <span style={{ color: "#4CAF50", fontWeight: 600, marginLeft: 6 }}>(Owner)</span>}
+                    {member.role === "member" && <span style={{ color: "#888", marginLeft: 6 }}>(Member)</span>}
+                  </div>
+                </li>
               ))}
             </ul>
           </div>
@@ -83,10 +96,26 @@ export default function SharedGroupPage() {
           />
           <button
             type="submit"
-            className="add-food-button"
-            style={{ width: "100%", marginTop: 16, fontSize: "1.25rem" }}
+            style={{
+              width: "100%",
+              marginTop: 16,
+              fontSize: "1.15rem",
+              border: "1.5px solid #4CAF50",
+              color: "#4CAF50",
+              background: "#fff",
+              borderRadius: 12,
+              padding: "12px 0",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8
+            }}
           >
-            Invite to Shared Fridge
+            <span style={{ display: "flex", alignItems: "center", marginRight: 8 }}>
+              <svg width="22" height="22" fill="none" stroke="#4CAF50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+            Add a Fridge Member
           </button>
         </form>
         {message && <div style={{ color: "#8a6ae6" }}>{message}</div>}

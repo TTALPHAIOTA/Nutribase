@@ -85,35 +85,23 @@ router.post("/add-food", async (req, res) => {
   }
 });
 
-// Add user to group
-router.post("/add-to-group", async (req, res) => {
-  try {
-    const { username, member } = req.body; // username = group owner, member = user to add
-    const collection = db.collection("users");
-    const result = await collection.updateOne(
-      { username },
-      { $addToSet: { group: member } }
-    );
-    if (result.modifiedCount === 1) {
-      res.status(200).json({ message: "User added to group" });
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (err) {
-    res.status(500).json({ message: "Error adding to group" });
-  }
-});
+// DEPRECATED: Add user to group (old structure, not used with new roles)
+// router.post("/add-to-group", ... );
 
-// Get user data (foods and group)
+// Get user data (foods and group, with member roles)
 router.get("/user/:username", async (req, res) => {
   try {
     const collection = db.collection("users");
     const user = await collection.findOne(
       { username: req.params.username },
-      { projection: { password: 0 } } // Don't return password
+      { projection: { password: 0 } }
     );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+    // If group exists, enrich members with their roles
+    if (user.group && user.group.members) {
+      user.group.members = user.group.members.map(m => ({ username: m.username, role: m.role }));
     }
     res.json(user);
   } catch (err) {
@@ -133,7 +121,7 @@ router.post("/group/create", async (req, res) => {
         group: {
           name: groupName,
           leader: username,
-          members: [username]
+          members: [{ username, role: "owner" }]
         }
       }
     }
@@ -141,22 +129,27 @@ router.post("/group/create", async (req, res) => {
   res.json({ message: "Group created" });
 });
 
-// Invite member (leader only)
+// Invite member (owner only)
 router.post("/group/invite", async (req, res) => {
   const { username, member } = req.body;
   const collection = db.collection("users");
   const leaderUser = await collection.findOne({ username });
   if (!leaderUser?.group || leaderUser.group.leader !== username)
-    return res.status(403).json({ message: "Only leader can invite" });
+    return res.status(403).json({ message: "Only owner can invite" });
 
-  // Add member to group.members for all group members
+  // Add member as role 'member'
   const groupName = leaderUser.group.name;
   const groupMembers = leaderUser.group.members;
-  const newMembers = [...new Set([...groupMembers, member])];
+  // Prevent duplicates
+  if (groupMembers.some(m => m.username === member)) {
+    return res.status(400).json({ message: "User already in group" });
+  }
+  const newMembers = [...groupMembers, { username: member, role: "member" }];
 
   // Update group for all current members and new member
+  const usernames = newMembers.map(m => m.username);
   await collection.updateMany(
-    { username: { $in: newMembers } },
+    { username: { $in: usernames } },
     {
       $set: {
         "group.name": groupName,
@@ -168,23 +161,25 @@ router.post("/group/invite", async (req, res) => {
   res.json({ message: "Member invited" });
 });
 
-// Kick member (leader only)
+// Kick member (owner only)
 router.post("/group/kick", async (req, res) => {
   const { username, member } = req.body;
   const collection = db.collection("users");
   const leaderUser = await collection.findOne({ username });
   if (!leaderUser?.group || leaderUser.group.leader !== username)
-    return res.status(403).json({ message: "Only leader can kick" });
+    return res.status(403).json({ message: "Only owner can kick" });
 
   const groupName = leaderUser.group.name;
-  const newMembers = leaderUser.group.members.filter(m => m !== member);
+  // Remove member object by username
+  const newMembers = leaderUser.group.members.filter(m => m.username !== member);
 
   // Remove group from kicked member
   await collection.updateOne({ username: member }, { $unset: { group: "" } });
 
   // Update group for remaining members
+  const usernames = newMembers.map(m => m.username);
   await collection.updateMany(
-    { username: { $in: newMembers } },
+    { username: { $in: usernames } },
     {
       $set: {
         "group.name": groupName,
@@ -205,22 +200,25 @@ router.post("/group/leave", async (req, res) => {
 
   const groupName = user.group.name;
   const leader = user.group.leader;
-  const members = user.group.members.filter(m => m !== username);
+  // Remove member object by username
+  const members = user.group.members.filter(m => m.username !== username);
 
   // Remove group from leaving member
   await collection.updateOne({ username }, { $unset: { group: "" } });
 
   if (username === leader) {
-    // If leader leaves, delete group for all
+    // If owner leaves, delete group for all
+    const usernames = members.map(m => m.username);
     await collection.updateMany(
-      { username: { $in: members } },
+      { username: { $in: usernames } },
       { $unset: { group: "" } }
     );
-    return res.json({ message: "Group deleted (leader left)" });
+    return res.json({ message: "Group deleted (owner left)" });
   } else {
     // Update group for remaining members
+    const usernames = members.map(m => m.username);
     await collection.updateMany(
-      { username: { $in: members } },
+      { username: { $in: usernames } },
       {
         $set: {
           "group.name": groupName,
@@ -233,16 +231,17 @@ router.post("/group/leave", async (req, res) => {
   }
 });
 
-// Rename group (leader only)
+// Rename group (owner only)
 router.post("/group/rename", async (req, res) => {
   const { username, newName } = req.body;
   const collection = db.collection("users");
   const user = await collection.findOne({ username });
   if (!user?.group || user.group.leader !== username)
-    return res.status(403).json({ message: "Only leader can rename" });
+    return res.status(403).json({ message: "Only owner can rename" });
 
+  const usernames = user.group.members.map(m => m.username);
   await collection.updateMany(
-    { username: { $in: user.group.members } },
+    { username: { $in: usernames } },
     { $set: { "group.name": newName } }
   );
   res.json({ message: "Group renamed" });

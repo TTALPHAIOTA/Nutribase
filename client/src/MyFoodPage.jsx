@@ -33,7 +33,8 @@ export default function MyFoodPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [newFood, setNewFood] = useState({ name: "", dateAdded: "" })
 
-  const username = "Emanuel"
+  // Use the logged-in username from localStorage
+  const username = localStorage.getItem("username") || ""
 
   useEffect(() => {
     async function fetchData() {

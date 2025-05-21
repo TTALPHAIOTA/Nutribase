@@ -58,7 +58,7 @@ export default function ProfilePage() {
 
       <button className="logout-btn" onClick={() => {
         localStorage.removeItem("username")
-        navigate("/login")
+        navigate("/")
       }}>
         Logout
       </button>
