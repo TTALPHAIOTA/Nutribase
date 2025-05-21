@@ -1,9 +1,25 @@
 // server/routes/account.js
 import express from "express";
-import bcrypt from "bcrypt"; // You'll need to install this package
+import bcrypt from "bcryptjs";
 import db from "../db/connection.js";
+import multer from "multer";
+import mongoose from "mongoose";
 
 const router = express.Router();
+const upload = multer();
+
+// --- Mongoose Models ---
+const FoodSchema = new mongoose.Schema({
+  name: String,
+  dateAdded: String,
+  photo: Buffer,
+  photoType: String,
+});
+const UserSchema = new mongoose.Schema({
+  username: String,
+  foods: [FoodSchema],
+});
+const User = mongoose.model("User", UserSchema);
 
 // Register a new user
 router.post("/register", async (req, res) => {
@@ -66,207 +82,56 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Add food to user's list
+// --- Add food (without photo) ---
 router.post("/add-food", async (req, res) => {
-  try {
-    const { username, food } = req.body;
-    const collection = db.collection("users");
-    const result = await collection.updateOne(
-      { username },
-      { $push: { foods: food } }
-    );
-    if (result.modifiedCount === 1) {
-      res.status(200).json({ message: "Food added" });
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (err) {
-    res.status(500).json({ message: "Error adding food" });
-  }
+  const { username, food } = req.body;
+  let user = await User.findOne({ username });
+  if (!user) user = await User.create({ username, foods: [] });
+  user.foods.push(food);
+  await user.save();
+  res.json({ message: "Food added" });
 });
 
-// Add user to group
-router.post("/add-to-group", async (req, res) => {
-  try {
-    const { username, member } = req.body; // username = group owner, member = user to add
-    const collection = db.collection("users");
-    const result = await collection.updateOne(
-      { username },
-      { $addToSet: { group: member } }
-    );
-    if (result.modifiedCount === 1) {
-      res.status(200).json({ message: "User added to group" });
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (err) {
-    res.status(500).json({ message: "Error adding to group" });
-  }
+// --- Upload food photo ---
+router.post("/upload-food-photo", upload.single("photo"), async (req, res) => {
+  const { username, foodName } = req.body;
+  const user = await User.findOne({ username });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const food = user.foods.find(f => f.name === foodName);
+  if (!food) return res.status(404).json({ message: "Food not found" });
+  food.photo = req.file.buffer;
+  food.photoType = req.file.mimetype;
+  await user.save();
+  res.json({ message: "Photo uploaded" });
 });
 
-// Get user data (foods and group)
-router.get("/user/:username", async (req, res) => {
-  try {
-    const collection = db.collection("users");
-    const user = await collection.findOne(
-      { username: req.params.username },
-      { projection: { password: 0 } } // Don't return password
-    );
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching user data" });
-  }
+// --- Serve food photo ---
+router.get("/food-photo/:username/:foodName", async (req, res) => {
+  const { username, foodName } = req.params;
+  const user = await User.findOne({ username });
+  if (!user) return res.status(404).end();
+  const food = user.foods.find(f => f.name === foodName);
+  if (!food || !food.photo) return res.status(404).end();
+  res.set("Content-Type", food.photoType || "image/jpeg");
+  res.send(food.photo);
 });
 
-// Create a group
-router.post("/group/create", async (req, res) => {
-  const { username, groupName } = req.body;
+// Delete food from user's list
+router.post("/delete-food", async (req, res) => {
+  const { username, foodName, dateAdded } = req.body;
+  if (!username || !foodName || !dateAdded) {
+    return res.status(400).json({ message: "Missing username, foodName, or dateAdded" });
+  }
   const collection = db.collection("users");
-  // Set group for user
-  await collection.updateOne(
+  const result = await collection.updateOne(
     { username },
-    {
-      $set: {
-        group: {
-          name: groupName,
-          leader: username,
-          members: [username]
-        }
-      }
-    }
+    { $pull: { foods: { name: foodName, dateAdded: dateAdded } } }
   );
-  res.json({ message: "Group created" });
-});
-
-// Invite member (leader only)
-router.post("/group/invite", async (req, res) => {
-  const { username, member } = req.body;
-  const collection = db.collection("users");
-  const leaderUser = await collection.findOne({ username });
-  if (!leaderUser?.group || leaderUser.group.leader !== username)
-    return res.status(403).json({ message: "Only leader can invite" });
-
-  // Add member to group.members for all group members
-  const groupName = leaderUser.group.name;
-  const groupMembers = leaderUser.group.members;
-  const newMembers = [...new Set([...groupMembers, member])];
-
-  // Update group for all current members and new member
-  await collection.updateMany(
-    { username: { $in: newMembers } },
-    {
-      $set: {
-        "group.name": groupName,
-        "group.leader": username,
-        "group.members": newMembers
-      }
-    }
-  );
-  res.json({ message: "Member invited" });
-});
-
-// Kick member (leader only)
-router.post("/group/kick", async (req, res) => {
-  const { username, member } = req.body;
-  const collection = db.collection("users");
-  const leaderUser = await collection.findOne({ username });
-  if (!leaderUser?.group || leaderUser.group.leader !== username)
-    return res.status(403).json({ message: "Only leader can kick" });
-
-  const groupName = leaderUser.group.name;
-  const newMembers = leaderUser.group.members.filter(m => m !== member);
-
-  // Remove group from kicked member
-  await collection.updateOne({ username: member }, { $unset: { group: "" } });
-
-  // Update group for remaining members
-  await collection.updateMany(
-    { username: { $in: newMembers } },
-    {
-      $set: {
-        "group.name": groupName,
-        "group.leader": username,
-        "group.members": newMembers
-      }
-    }
-  );
-  res.json({ message: "Member kicked" });
-});
-
-// Leave group (any member)
-router.post("/group/leave", async (req, res) => {
-  const { username } = req.body;
-  const collection = db.collection("users");
-  const user = await collection.findOne({ username });
-  if (!user?.group) return res.status(400).json({ message: "Not in group" });
-
-  const groupName = user.group.name;
-  const leader = user.group.leader;
-  const members = user.group.members.filter(m => m !== username);
-
-  // Remove group from leaving member
-  await collection.updateOne({ username }, { $unset: { group: "" } });
-
-  if (username === leader) {
-    // If leader leaves, delete group for all
-    await collection.updateMany(
-      { username: { $in: members } },
-      { $unset: { group: "" } }
-    );
-    return res.json({ message: "Group deleted (leader left)" });
+  if (result.modifiedCount === 1) {
+    res.status(200).json({ message: "Food deleted" });
   } else {
-    // Update group for remaining members
-    await collection.updateMany(
-      { username: { $in: members } },
-      {
-        $set: {
-          "group.name": groupName,
-          "group.leader": leader,
-          "group.members": members
-        }
-      }
-    );
-    return res.json({ message: "Left group" });
+    res.status(404).json({ message: "Food not found" });
   }
-});
-
-// Rename group (leader only)
-router.post("/group/rename", async (req, res) => {
-  const { username, newName } = req.body;
-  const collection = db.collection("users");
-  const user = await collection.findOne({ username });
-  if (!user?.group || user.group.leader !== username)
-    return res.status(403).json({ message: "Only leader can rename" });
-
-  await collection.updateMany(
-    { username: { $in: user.group.members } },
-    { $set: { "group.name": newName } }
-  );
-  res.json({ message: "Group renamed" });
-});
-
-// Invite user to group (with existence check)
-router.post("/invite-to-group", async (req, res) => {
-  const { username, member } = req.body;
-  const collection = db.collection("users");
-
-  // Check if invited user exists
-  const invitedUser = await collection.findOne({ username: member });
-  if (!invitedUser) {
-    return res.status(404).json({ message: "User doesn't exist" });
-  }
-
-  // Optionally: Add a pending invitation to the invited user's document
-  await collection.updateOne(
-    { username: member },
-    { $addToSet: { invitations: { from: username, date: new Date() } } }
-  );
-
-  // You can also notify the inviter that the invite was sent
-  res.json({ message: "Invitation sent" });
 });
 
 export default router;
