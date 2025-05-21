@@ -16,7 +16,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="settings-options">
-        <div className="settings-item">Language</div>
+        <div className="settings-item">Change Profile Photo</div>
         <div className="settings-item">Change Personal Info</div>
         <div className="settings-item">Change Password</div>
       </div>
