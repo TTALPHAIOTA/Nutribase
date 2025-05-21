@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function SharedGroup() {
+  const navigate = useNavigate()
   const [members, setMembers] = useState([
     { name: "Ganesh Kumarappan (Owner)", time: "Just now" },
     { name: "Michelle Hong", time: "1d ago" },
@@ -63,7 +65,10 @@ export default function SharedGroup() {
 
       {/* Close button */}
       <div style={{ position: "absolute", top: "20px", right: "20px", zIndex: 2 }}>
-        <button style={{ background: "none", border: "none", color: "white", fontSize: "24px", cursor: "pointer" }}>
+        <button
+          style={{ background: "none", border: "none", color: "white", fontSize: "24px", cursor: "pointer" }}
+          onClick={() => navigate("/profile")}
+        >
           ✕
         </button>
       </div>
