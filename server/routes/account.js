@@ -1,6 +1,6 @@
 // server/routes/account.js
 import express from "express";
-import bcrypt from "bcrypt"; // You'll need to install this package
+import bcrypt from "bcryptjs";
 import db from "../db/connection.js";
 import multer from "multer";
 import { Binary } from "mongodb";
