@@ -20,6 +20,7 @@
     "express-openid-connect": "^2.18.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.0",
+    "multer": "^2.0.0",
     "server": "^1.0.41"
   },
   "devDependencies": {
