@@ -21,11 +21,11 @@ export default function SettingsPage() {
 
   return (
     <div className="mobile-container">
-      <div className="page-header">
-        <span className="back-button" onClick={() => navigate("/profile")}>
+      <div className="settings-header">
+        <span className="back-arrow" onClick={() => navigate("/profile")}>
           ←
         </span>
-        <span className="header-title">Settings</span>
+        <h2>Settings</h2>
       </div>
       <div className="settings-options">
         <button
