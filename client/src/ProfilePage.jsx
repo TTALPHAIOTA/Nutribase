@@ -74,7 +74,7 @@ export default function ProfilePage() {
           </span>{" "}
           About
         </button>
-        <button className="profile-list-item" onClick={() => navigate("/sharedfood")}>
+        <button className="profile-list-item" onClick={() => navigate("/sharedgroup")}>
           <span role="img" aria-label="group">
             👥
           </span>{" "}
