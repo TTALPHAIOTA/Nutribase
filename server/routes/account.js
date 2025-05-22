@@ -1,7 +1,6 @@
 // server/routes/account.js
 import express from "express";
 import bcrypt from "bcryptjs";
-import db from "../db/connection.js";
 import multer from "multer";
 import mongoose from "mongoose";
 
@@ -18,42 +17,36 @@ const FoodSchema = new mongoose.Schema({
 });
 const UserSchema = new mongoose.Schema({
   username: String,
+  password: String,
+  createdAt: { type: Date, default: Date.now },
   foods: [FoodSchema],
+  group: Array,
+  invitations: Array,
 });
 const User = mongoose.model("User", UserSchema);
 
 // Register a new user
 router.post("/register", async (req, res) => {
   try {
-    // Use the exported collection function
-    const collection = db.collection("users");
-    
-    // Check if username already exists
-    const existingUser = await collection.findOne({ username: req.body.username });
+    const existingUser = await User.findOne({ username: req.body.username });
     if (existingUser) {
       return res.status(400).send("Username already exists");
     }
-    
-    // Hash the password before storing
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-    
-    // Create new user document
-    const newUser = {
+
+    const newUserDoc = await User.create({
       username: req.body.username,
       password: hashedPassword,
       createdAt: new Date(),
       foods: [],
-      group: []
-    };
-    
-    // Insert the user into database
-    const result = await collection.insertOne(newUser);
-    
-    // Return success without including password
+      group: [],
+      invitations: [],
+    });
+
     res.status(201).send({
       message: "User registered successfully",
-      userId: result.insertedId
+      userId: newUserDoc._id
     });
   } catch (err) {
     console.error("Error registering user:", err);
@@ -64,8 +57,7 @@ router.post("/register", async (req, res) => {
 // Login route
 router.post("/login", async (req, res) => {
   try {
-    const collection = db.collection("users");
-    const user = await collection.findOne({ username: req.body.username });
+    const user = await User.findOne({ username: req.body.username });
     if (!user) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
@@ -83,17 +75,19 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// --- Add food (without photo) ---
+// Add food (without photo)
 router.post("/add-food", async (req, res) => {
   const { username, food } = req.body;
   let user = await User.findOne({ username });
   if (!user) user = await User.create({ username, foods: [] });
-  user.foods.push(food);
+  // Ensure food is always an object (not a string)
+  const foodObj = typeof food === "string" ? { name: food } : food;
+  user.foods.push(foodObj);
   await user.save();
   res.json({ message: "Food added" });
 });
 
-// --- Upload food photo ---
+// Upload food photo
 router.post("/upload-food-photo", upload.single("photo"), async (req, res) => {
   const { username, foodName } = req.body;
   const user = await User.findOne({ username });
@@ -106,7 +100,7 @@ router.post("/upload-food-photo", upload.single("photo"), async (req, res) => {
   res.json({ message: "Photo uploaded" });
 });
 
-// --- Serve food photo ---
+// Serve food photo
 router.get("/food-photo/:username/:foodName", async (req, res) => {
   const { username, foodName } = req.params;
   const user = await User.findOne({ username });
@@ -123,12 +117,12 @@ router.post("/delete-food", async (req, res) => {
   if (!username || !foodName || !dateAdded) {
     return res.status(400).json({ message: "Missing username, foodName, or dateAdded" });
   }
-  const collection = db.collection("users");
-  const result = await collection.updateOne(
-    { username },
-    { $pull: { foods: { name: foodName, dateAdded: dateAdded } } }
-  );
-  if (result.modifiedCount === 1) {
+  const user = await User.findOne({ username });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const initialLength = user.foods.length;
+  user.foods = user.foods.filter(f => !(f.name === foodName && f.dateAdded === dateAdded));
+  await user.save();
+  if (user.foods.length !== initialLength) {
     res.status(200).json({ message: "Food deleted" });
   } else {
     res.status(404).json({ message: "Food not found" });
