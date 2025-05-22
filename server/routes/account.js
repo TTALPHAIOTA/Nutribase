@@ -14,6 +14,7 @@ const FoodSchema = new mongoose.Schema({
   dateAdded: String,
   photo: Buffer,
   photoType: String,
+  weight: Number
 });
 const UserSchema = new mongoose.Schema({
   username: String,
@@ -134,28 +135,5 @@ router.post("/delete-food", async (req, res) => {
   }
 });
 
-// --- Take weight from food scale ---
-router.post("/take-weight", async (req, res) => {
-  const { username, name, weight } = req.body;
-
-  if (typeof weight !== 'number') {
-    return res.status(400).json({ error: 'Weight must be a number' });
-  }
-
-  // // Find the user
-  // const user = await User.findOne({ username });
-  // if (!user) return res.status(404).json({ error: "User not found" });
-
-  // // Find the food item by name
-  // const food = user.foods.find(f => f.name === name);
-  // if (!food) return res.status(404).json({ error: "Food not found" });
-
-  // Update the weight
-  food.weight = weight;
-  await user.save();
-
-  res.json({ message: "Weight updated successfully", food });
-});
-
-
+export { User };
 export default router;

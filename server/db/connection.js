@@ -1,62 +1,26 @@
-// Updated db/connection.js
-import dotenv from "dotenv"
-import { MongoClient, ServerApiVersion } from "mongodb";
+// db/connection.js
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
-const uri = process.env.ATLAS_URI || "";
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
+const uri =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://ThiccmanEmanuel:AlphaIota@alphaiota.7s3swar.mongodb.net/foodTracker?retryWrites=true&w=majority&appName=ALPHAIOTA";
+
+// Connect to MongoDB with Mongoose
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
-// Create a variable to track connection status
-let connected = false;
-let db;
+const db = mongoose.connection;
 
-async function connectToDatabase() {
-  if (!connected) {
-    try {
-      // Connect the client to the server
-      await client.connect();
-      // Send a ping to confirm a successful connection
-      await client.db("admin").command({ ping: 1 });
-      console.log("Pinged your deployment. You successfully connected to MongoDB!");
-      
-      // Set the database for our application
-      db = client.db("foodTracker"); // Change to your actual database name
-      connected = true;
-    } catch(err) {
-      console.error("Database connection error:", err);
-      throw err; // Rethrow to be handled by the caller
-    }
-  }
-  return db;
-}
+db.on("connected", () => {
+  console.log("Connected to MongoDB (via Mongoose)!");
+});
+db.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
 
-// Initial connection attempt
-connectToDatabase().catch(console.error);
-
-export default {
-  getDb: () => {
-    if (!connected) {
-      throw new Error("Database not connected");
-    }
-    return db;
-  },
-  collection: (name) => {
-    if (!connected) {
-      throw new Error("Database not connected");
-    }
-    return db.collection(name);
-  },
-  close: async () => {
-    if (connected) {
-      await client.close();
-      connected = false;
-    }
-  }
-};
+export default mongoose;
