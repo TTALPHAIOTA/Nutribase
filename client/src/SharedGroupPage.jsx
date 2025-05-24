@@ -1,41 +1,118 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./ProfilePage.css"; // Assuming some styles might be shared or adapt as needed
 
-export default function SharedGroup() {
-  const navigate = useNavigate()
-  const [members, setMembers] = useState([
-    { name: "Ganesh Kumarappan (Owner)", time: "Just now" },
-    { name: "Michelle Hong", time: "1d ago" },
-    { name: "Emanuel Nader", time: "2d ago" },
-    { name: "Marcus Mendoza", time: "2d ago" },
-  ])
-  const [adding, setAdding] = useState(false)
-  const [newMember, setNewMember] = useState("")
+export default function SharedGroupPage() {
+  const navigate = useNavigate();
+  const [members, setMembers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  
+  const [isAdding, setIsAdding] = useState(false);
+  const [newMemberUsername, setNewMemberUsername] = useState("");
 
-  const handleAddMember = () => {
-    if (newMember.trim() !== "") {
-      setMembers([...members, { name: newMember.trim(), time: "Just now" }])
-      setNewMember("")
-      setAdding(false)
+  const loggedInUsername = localStorage.getItem("username");
+
+  const fetchGroupMembers = async () => {
+    if (!loggedInUsername) {
+      setError("You must be logged in to manage groups.");
+      setIsLoading(false);
+      return;
     }
-  }
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5050/account/user/${loggedInUsername}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data.");
+      }
+      const userData = await response.json();
+      setMembers(userData.group || []);
+      setError("");
+    } catch (err) {
+      setError(err.message);
+      setMembers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const handleRemove = (index) => {
-    const updated = [...members]
-    updated.splice(index, 1)
-    setMembers(updated)
-  }
+  useEffect(() => {
+    fetchGroupMembers();
+  }, [loggedInUsername]);
 
-  const handleCancel = () => {
-    setNewMember("")
-    setAdding(false)
+  const handleAddMember = async () => {
+    if (!newMemberUsername.trim()) {
+      setError("Please enter a username to add.");
+      return;
+    }
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch("http://localhost:5050/account/group/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentUsername: loggedInUsername, memberUsernameToAdd: newMemberUsername }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add member.");
+      }
+      setSuccess(data.message);
+      setMembers(data.group); // Update local state with new group from backend
+      setNewMemberUsername("");
+      setIsAdding(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => { setSuccess(""); setError(""); }, 3000);
+    }
+  };
+
+  const handleRemoveMember = async (memberUsernameToRemove) => {
+    if (!window.confirm(`Are you sure you want to remove ${memberUsernameToRemove} from your group?`)) return;
+    
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch("http://localhost:5050/account/group/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentUsername: loggedInUsername, memberUsernameToRemove }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to remove member.");
+      }
+      setSuccess(data.message);
+      setMembers(data.group); // Update local state
+      setNewMemberUsername("");
+      setIsAdding(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => { setSuccess(""); setError(""); }, 3000);
+    }
+  };
+
+  if (!loggedInUsername) {
+     return (
+         <div style={{ padding: '20px', textAlign: 'center' }}>
+             <p>Please log in to manage your shared group.</p>
+             <button onClick={() => navigate('/login')}>Go to Login</button>
+         </div>
+     );
   }
 
   return (
     <div
-      style={{
+      style={{ /* Using styles from your original SharedGroupPage for the purple theme */
         fontFamily: "Arial, sans-serif",
         maxWidth: "500px",
         margin: "0 auto",
@@ -47,23 +124,13 @@ export default function SharedGroup() {
         overflow: "hidden",
       }}
     >
-      {/* Background wave */}
       <div
         style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          opacity: 0.15,
-          zIndex: 0,
-          backgroundColor: "white",
-          borderRadius: "50%",
-          transform: "scale(1.5) translateY(-20%) translateX(20%)",
+          position: "absolute", top: 0, right: 0, bottom: 0, left: 0,
+          opacity: 0.15, zIndex: 0, backgroundColor: "white",
+          borderRadius: "50%", transform: "scale(1.5) translateY(-20%) translateX(20%)",
         }}
       />
-
-      {/* Close button */}
       <div style={{ position: "absolute", top: "20px", right: "20px", zIndex: 2 }}>
         <button
           style={{ background: "none", border: "none", color: "white", fontSize: "24px", cursor: "pointer" }}
@@ -73,193 +140,92 @@ export default function SharedGroup() {
         </button>
       </div>
 
-      {/* Main content */}
       <div style={{ position: "relative", zIndex: 1 }}>
-        <h1 style={{ fontSize: "40px", fontWeight: "bold", marginBottom: "5px" }}>Hi Ganesh,</h1>
-        <p style={{ fontSize: "24px", marginTop: "0" }}>Manage your fridge.</p>
+        <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "5px" }}>Hi {loggedInUsername},</h1>
+        <p style={{ fontSize: "20px", marginTop: "0", marginBottom: "30px" }}>Manage your shared fridge group.</p>
 
-        {/* Card */}
-        <div
-          style={{
-            backgroundColor: "white",
-            borderRadius: "20px",
-            padding: "20px",
-            marginTop: "30px",
-            color: "black",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <h2 style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>Your Nutribase</h2>
-            <a href="#" style={{ color: "#37ad60", textDecoration: "none", fontWeight: "bold" }}>
-              See all
-            </a>
-          </div>
+        {error && <p style={{ color: "red", backgroundColor: 'white', padding: '10px', borderRadius: '5px' }}>{error}</p>}
+        {success && <p style={{ color: "green", backgroundColor: 'white', padding: '10px', borderRadius: '5px' }}>{success}</p>}
 
-          {/* Members list */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            {members.map((member, index) => (
-              <div
-                key={index}
+        <div style={{ backgroundColor: "white", borderRadius: "20px", padding: "20px", color: "black" }}>
+          <h2 style={{ fontSize: "24px", fontWeight: "bold", margin: "0 0 20px 0" }}>Group Members</h2>
+          
+          {isLoading && <p>Loading members...</p>}
+          
+          {!isLoading && members.length === 0 && !isAdding && (
+            <p>You haven't added anyone to your group yet.</p>
+          )}
+
+          {!isLoading && members.map((memberUsername, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                paddingBottom: "10px", marginBottom: "10px", borderBottom: "1px solid #ebebeb",
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                 <img src={`http://localhost:5050/account/user/${memberUsername}/profile-picture`} 
+                      alt={memberUsername} 
+                      style={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: "#f0f0f0", objectFit: 'cover' }}
+                      onError={(e) => { e.target.onerror = null; e.target.src="https://via.placeholder.com/40?text=Pic"; }} // Fallback
+                 />
+                 <span>{memberUsername}</span>
+              </div>
+              <button
+                onClick={() => handleRemoveMember(memberUsername)}
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  paddingBottom: "10px",
-                  borderBottom: "1px solid #ebebeb",
+                  background: "none", border: "1px solid #e53e3e", color: "#e53e3e",
+                  fontSize: "14px", cursor: "pointer", padding: '5px 10px', borderRadius: '5px'
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-                  <div
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "50%",
-                      backgroundColor: "#f0f0f0",
-                      overflow: "hidden",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <img
-                      src="https://via.placeholder.com/48"
-                      alt={member.name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontWeight: "bold" }}>{member.name}</p>
-                    <p style={{ margin: 0, fontSize: "0.875rem", color: "#81838f" }}>{member.time}</p>
-                  </div>
-                </div>
+                Remove
+              </button>
+            </div>
+          ))}
 
-                <button
-                  onClick={() => handleRemove(index)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#e53e3e",
-                    fontSize: "20px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  ✕
+          {isAdding ? (
+            <div style={{ marginTop: "20px" }}>
+              <input
+                type="text"
+                placeholder="Enter username to add"
+                value={newMemberUsername}
+                onChange={(e) => setNewMemberUsername(e.target.value)}
+                style={{
+                  padding: "12px", width: "100%", marginBottom: "10px",
+                  borderRadius: "10px", border: "1px solid #ccc", fontSize: "16px", color: 'black'
+                }}
+              />
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button onClick={handleAddMember} disabled={isLoading} style={buttonStyle("#37ad60", "white")}>
+                  {isLoading ? "Adding..." : "Add Member"}
+                </button>
+                <button onClick={() => setIsAdding(false)} style={buttonStyle("#eee", "#333")}>
+                  Cancel
                 </button>
               </div>
-            ))}
-
-            {/* Add member input */}
-            {adding && (
-              <div style={{ marginTop: "20px" }}>
-                <input
-                  type="text"
-                  placeholder="Enter member name"
-                  value={newMember}
-                  onChange={(e) => setNewMember(e.target.value)}
-                  style={{
-                    padding: "12px",
-                    width: "100%",
-                    marginBottom: "10px",
-                    borderRadius: "10px",
-                    border: "1px solid #ccc",
-                    fontSize: "16px",
-                  }}
-                />
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <button
-                    onClick={handleAddMember}
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      backgroundColor: "#37ad60",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "10px",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Add
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      backgroundColor: "#eee",
-                      color: "#333",
-                      border: "none",
-                      borderRadius: "10px",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Add Member Button */}
-            {!adding && (
-              <button
-                onClick={() => setAdding(true)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "10px",
-                  width: "100%",
-                  padding: "12px",
-                  marginTop: "20px",
-                  border: "2px solid #37ad60",
-                  borderRadius: "50px",
-                  backgroundColor: "transparent",
-                  color: "#37ad60",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  cursor: "pointer",
-                }}
-              >
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "20px",
-                    height: "20px",
-                    position: "relative",
-                    transform: "rotate(-45deg)",
-                  }}
-                >
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "0",
-                      right: "0",
-                      height: "2px",
-                      backgroundColor: "#37ad60",
-                      transform: "translateY(-50%)",
-                    }}
-                  ></span>
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "0",
-                      bottom: "0",
-                      width: "2px",
-                      backgroundColor: "#37ad60",
-                      transform: "translateX(-50%)",
-                    }}
-                  ></span>
-                </span>
-                Add a Fridge Member
-              </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsAdding(true)}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
+                width: "100%", padding: "12px", marginTop: "20px", border: "2px solid #37ad60",
+                borderRadius: "50px", backgroundColor: "transparent", color: "#37ad60",
+                fontWeight: "bold", fontSize: "16px", cursor: "pointer",
+              }}
+            >
+              + Add a Fridge Member
+            </button>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }
+
+const buttonStyle = (bgColor, textColor) => ({
+  flex: 1, padding: "10px", backgroundColor: bgColor, color: textColor,
+  border: "none", borderRadius: "10px", fontWeight: "bold",
+  fontSize: "16px", cursor: "pointer",
+});
