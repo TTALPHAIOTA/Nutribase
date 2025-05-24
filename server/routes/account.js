@@ -99,22 +99,56 @@ router.get("/user/:username", async (req, res) => {
 });
 
 // Add food item
+// server/routes/account.js
 router.post("/add-food", async (req, res) => {
   const { username, foodData } = req.body;
   if (!username || !foodData || !foodData.name || !foodData.dateAdded) {
     return res.status(400).json({ message: "Missing username or essential food data (name, dateAdded)" });
   }
+
   try {
     const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    const newFood = { ...foodData, isAwaitingScaleInput: false };
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    const newFood = { // This is a plain JS object, Mongoose will convert it
+      name: foodData.name,
+      dateAdded: foodData.dateAdded,
+      weight: foodData.weight ? parseFloat(foodData.weight) : null,
+      brand: foodData.brand,
+      price: foodData.price,
+      expiration_date: foodData.expiration_date,
+      isAwaitingScaleInput: false
+    };
+
     user.foods.push(newFood);
-    await user.save();
-    const addedFoodItem = user.foods[user.foods.length - 1];
-    res.status(201).json({ message: "Food added successfully", foodItem: addedFoodItem });
+    await user.save(); // After save, the subdocument in user.foods will have its _id
+    
+    // Get the newly added subdocument (it will now have an _id)
+    const addedFoodItemFromDb = user.foods[user.foods.length - 1]; 
+
+    // **CRITICAL: Ensure _id is present before sending**
+    if (!addedFoodItemFromDb || !addedFoodItemFromDb._id) {
+        console.error("BACKEND ERROR: _id missing from subdocument after save!", addedFoodItemFromDb);
+        return res.status(500).json({ message: "Internal server error: Could not retrieve food item ID after saving." });
+    }
+
+    // Convert to a plain object to ensure all virtuals and _id are properly serialized
+    const plainFoodItem = addedFoodItemFromDb.toObject({ virtuals: true }); 
+    // virtuals: true can be helpful if you have any virtuals, though _id isn't one.
+    // .toObject() is generally good practice for API responses.
+
+    console.log("Backend /add-food responding with foodItem:", plainFoodItem); // Log the object being sent
+
+    res.status(201).json({ 
+        message: "Food added successfully", 
+        foodItem: plainFoodItem // Send the plain object
+    });
+
   } catch (err) {
     console.error("Error adding food:", err);
-    res.status(500).json({ message: "Error adding food" });
+    res.status(500).json({ message: "Error adding food: " + err.message });
   }
 });
 

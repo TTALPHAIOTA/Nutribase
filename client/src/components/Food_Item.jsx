@@ -74,50 +74,86 @@ export default function Food_Item({
       setErrorMessage("Username not found. Cannot get weight.");
       return;
     }
+    
+    // Disable button immediately
     setIsWaitingForWeight(true);
     setErrorMessage("");
     setSuccessMessage("");
 
-    let currentFoodId = formData._id;
+    let foodIdToPrepare = formData._id; // Start with existing ID if available
 
     try {
-      // If it's a new item (no _id yet), first save it to get an ID
-      if (!isEditing || !currentFoodId) {
-         const tempFoodData = { ...formData, name: formData.name || "New Item", dateAdded: formData.dateAdded || new Date().toISOString().slice(0,10) };
-         // Ensure essential fields are present before this preliminary save
+      // If it's a new item (no _id yet), or if formData._id is somehow missing, first save it to get an ID
+      if (!isEditing || !formData._id) {
+         const tempFoodData = { ...formData, name: formData.name || "New Item", dateAdded: formData.dateAdded || new Date().toISOString().slice(0,16) };
          if (!tempFoodData.name || !tempFoodData.dateAdded) {
              setErrorMessage("Please enter at least Food Name and Date Added before getting weight.");
-             setIsWaitingForWeight(false);
+             setIsWaitingForWeight(false); // Re-enable button
              return;
          }
+
+         console.log("Pre-saving new food item:", tempFoodData);
          const addRes = await fetch(`http://localhost:5050/account/add-food`, {
              method: 'POST',
              headers: { 'Content-Type': 'application/json' },
              body: JSON.stringify({ username, foodData: tempFoodData }),
          });
-         if (!addRes.ok) throw new Error(await addRes.text() || "Failed to pre-save food item");
-         const addedItem = await addRes.json();
-         currentFoodId = addedItem.foodItem._id;
-         setFormData(prev => ({ ...prev, _id: currentFoodId, name: addedItem.foodItem.name, dateAdded: addedItem.foodItem.dateAdded }));
-         setIsEditing(true); // Now it's an existing item
+
+         const addedItemResponse = await addRes.json(); // Always try to parse JSON
+         console.log("Pre-save response from backend:", addedItemResponse);
+
+         if (!addRes.ok) {
+            throw new Error(addedItemResponse.message || "Failed to pre-save food item. Status: " + addRes.status);
+         }
+         
+         if (!addedItemResponse.foodItem || !addedItemResponse.foodItem._id) {
+             console.error("Pre-save did not return a valid food item with _id:", addedItemResponse);
+             throw new Error("Failed to get a valid ID after pre-saving food item.");
+         }
+
+         foodIdToPrepare = addedItemResponse.foodItem._id;
+         
+         // Update formData with ALL relevant fields from the newly created item
+         // This is crucial so that subsequent operations (like polling) use the correct data
+         setFormData(prev => ({ 
+             ...prev, 
+             _id: foodIdToPrepare, // Set the new _id
+             name: addedItemResponse.foodItem.name, 
+             dateAdded: addedItemResponse.foodItem.dateAdded,
+             brand: addedItemResponse.foodItem.brand !== undefined ? addedItemResponse.foodItem.brand : prev.brand,
+             price: addedItemResponse.foodItem.price !== undefined ? addedItemResponse.foodItem.price : prev.price,
+             expiration_date: addedItemResponse.foodItem.expiration_date !== undefined ? addedItemResponse.foodItem.expiration_date : prev.expiration_date,
+             weight: addedItemResponse.foodItem.weight !== null && addedItemResponse.foodItem.weight !== undefined ? addedItemResponse.foodItem.weight.toString() : ""
+         }));
+         setIsEditing(true); // It's now an existing item being edited (or at least having weight added)
       }
 
-      // Now, tell backend to prepare this specific foodId for weighing
-      const prepareRes = await fetch(`http://localhost:5050/account/food-item/${currentFoodId}/prepare-for-weighing`, {
+      if (!foodIdToPrepare) { // Double check after potential pre-save
+          throw new Error("Food ID is missing. Cannot prepare for weighing.");
+      }
+
+      console.log(`Preparing food item with ID: ${foodIdToPrepare} for weighing.`);
+      const prepareRes = await fetch(`http://localhost:5050/account/food-item/${foodIdToPrepare}/prepare-for-weighing`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username }),
       });
 
+      const prepareData = await prepareRes.json(); // Always try to parse JSON
+      console.log("Prepare for weighing response:", prepareData);
+
       if (!prepareRes.ok) {
-        throw new Error(await prepareRes.text() || "Failed to prepare for weighing");
+        throw new Error(prepareData.message || "Failed to prepare for weighing. Status: " + prepareRes.status);
       }
-      setSuccessMessage("Ready for scale. Place item and press button on scale.");
-      // Polling will start via useEffect
+
+      setSuccessMessage(prepareData.message || "Ready for scale. Place item and press button on scale.");
+      // isWaitingForWeight is already true, polling will start/continue via useEffect
+      // Polling needs formData._id to be set, which it should be now due to setFormData above
+      
     } catch (err) {
-      console.error("Error getting weight from scale:", err);
+      console.error("Error in handleGetWeightFromScale:", err);
       setErrorMessage(`Error: ${err.message}`);
-      setIsWaitingForWeight(false);
+      setIsWaitingForWeight(false); // Re-enable button on error
     }
   };
 
