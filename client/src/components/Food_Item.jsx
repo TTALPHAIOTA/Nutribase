@@ -11,7 +11,7 @@ export default function Food_Item({
     _id: initialData?._id || null,
     name: initialData?.name || "",
     weight: initialData?.weight || "",
-    dateAdded: initialData?.dateAdded || new Date().toISOString().slice(0, 16), // Default to now
+    dateAdded: initialData?.dateAdded || new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }), // Default to local time
     brand: initialData?.brand || "",
     price: initialData?.price || "",
     expiration_date: initialData?.expiration_date || "",
