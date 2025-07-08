@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./food-item-styles.css";
 
 export default function Food_Item({
   initialData = null, // For editing
