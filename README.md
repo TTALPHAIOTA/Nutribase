@@ -26,13 +26,38 @@ Nutribase helps you and your roommates track food items in your fridge, monitor 
 
  
 
-### Wiring Diagram  
-![Wiring Diagram](https://via.placeholder.com/600x400?text=ESP32+Wiring+Diagram) *[Add Fritzing diagram image]*  
+### Wiring Diagram
+![image](https://github.com/user-attachments/assets/ba8af867-2c43-44ac-93a1-67ae96bc55c2)
+### Connection Guide
+1. **Load Cell Wiring**:
+   - Red wire → E+ (HX711)
+   - Black wire → E- (HX711)
+   - White wire → A- (HX711)
+   - Green wire → A+ (HX711)
+   - HX711 to ESP32:
+     - DT → GPIO 23
+     - SCK → GPIO 22
+     - VCC → 3.3V
+     - GND → GND
 
-1. Connect the load cell to HX711, then to ESP32.  
-2. Wire the RFID module via SPI.  
-3. Attach the LCD via I2C.   
+2. **RFID Module (SPI)**:
+   - SDA → GPIO 5
+   - SCK → GPIO 18
+   - MOSI → GPIO 23
+   - MISO → GPIO 19
+   - IRQ → Not connected
+   - GND → GND
+   - 3.3V → 3.3V
 
+3. **LCD Display (I2C)**:
+   - SDA → GPIO 21
+   - SCL → GPIO 22
+   - VCC → 5V
+   - GND → GND
+
+4. **Power Management**:
+   - Use separate 5V/2A power supply for load cells
+   - Add 100µF capacitor between HX711 VCC/GND
 ---
 
 ## Software Stack 💻  
@@ -73,6 +98,64 @@ npm start
    - HX711 (for weight sensor)
    - MFRC522 (for RFID)
    - WiFiClientSecure (for HTTPS connections)
+## ESP32 Firmware Setup 🛠️
+
+### HTTP Client Implementation
+The ESP32 sends weight data to your backend server via HTTP POST requests. Here's the core functionality:
+
+```cpp
+#include <HTTPClient.h>
+#include <WiFi.h>
+
+// Wi-Fi Configuration
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+const char* serverUrl = "https://your-backend-url.com/api/data";
+
+// Weight Posting Interval (ms)
+const long postInterval = 10000; 
+unsigned long lastPostTime = 0;
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("WiFi connected");
+}
+
+void loop() {
+  if (millis() - lastPostTime >= postInterval) {
+    lastPostTime = millis();
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(serverUrl);
+      http.addHeader("Content-Type", "application/json");
+      
+      // Get weight from load cell
+      float weight = LoadCell.getData(); 
+      
+      // Create JSON payload
+      String payload = "{\"weight\":" + String(weight, 2) + "}";
+      
+      // Send POST request
+      int httpCode = http.POST(payload);
+      
+      if (httpCode > 0) {
+        String response = http.getString();
+        Serial.println("Server response: " + response);
+      } else {
+        Serial.println("Error: " + http.errorToString(httpCode));
+      }
+      http.end();
+    } else {
+      Serial.println("WiFi disconnected");
+    }
+  }
+}
 
 # Frontend setup
 cd ../frontend
