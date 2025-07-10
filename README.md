@@ -1,8 +1,6 @@
 # Nutribase 🍎  
 **A Smart Fridge Tracker to Reduce Food Waste**  
 
-![Nutribase Demo](https://via.placeholder.com/800x400?text=Nutribase+Demo+GIF/Image) *[Replace with screenshot/GIF]*  
-
 Nutribase helps you and your roommates track food items in your fridge, monitor weight changes, and assign ownership to reduce food waste. With hardware integration (ESP32 + sensors), it’s a seamless bridge between your physical fridge and a collaborative digital dashboard.  
 
 ## Key Features ✨  
@@ -29,8 +27,7 @@ Nutribase helps you and your roommates track food items in your fridge, monitor 
 
 1. Connect the load cell to HX711, then to ESP32.  
 2. Wire the RFID module via SPI.  
-3. Attach the LCD via I2C.  
-*(See [hardware/README.md](/hardware) for detailed pinouts.)*  
+3. Attach the LCD via I2C.   
 
 ---
 
