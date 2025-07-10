@@ -1,7 +1,7 @@
 # Nutribase 🍎  
-**A Smart Fridge Tracker to Reduce Food Waste**  
+**A Smart Fridge Tracker**  
 
-Nutribase helps you and your roommates track food items in your fridge, monitor weight changes, and assign ownership to reduce food waste. With hardware integration (ESP32 + sensors), it’s a seamless bridge between your physical fridge and a collaborative digital dashboard.  
+Nutribase helps you and your roommates track food items in your fridge, monitor weight changes, and assign ownership. With hardware integration (ESP32 + sensors), it’s a seamless bridge between your physical fridge and a collaborative digital dashboard.  
 
 ## Key Features ✨  
 - **Real-time Weight Tracking** – ESP32 + load sensor logs food weight changes.  
@@ -17,7 +17,6 @@ Nutribase helps you and your roommates track food items in your fridge, monitor 
 - **Microcontroller**: ESP32  
 - **Sensors**:  
   - Weight sensor (e.g., HX711 + load cell)  
-  - RFID module (for tagging items/users)  
 - **Display**: LCD with I2C module  
 - **Misc**: Jumper wires, breadboard (3.5" x 2.25"), LED lights  
 - **Enclosure**: 3D-printed case
@@ -39,15 +38,6 @@ Nutribase helps you and your roommates track food items in your fridge, monitor 
      - SCK → GPIO 22
      - VCC → 3.3V
      - GND → GND
-
-2. **RFID Module (SPI)**:
-   - SDA → GPIO 5
-   - SCK → GPIO 18
-   - MOSI → GPIO 23
-   - MISO → GPIO 19
-   - IRQ → Not connected
-   - GND → GND
-   - 3.3V → 3.3V
 
 3. **LCD Display (I2C)**:
    - SDA → GPIO 21
@@ -97,7 +87,6 @@ npm start
    ```bash
    # Install these via Arduino Library Manager:
    - HX711 (for weight sensor)
-   - MFRC522 (for RFID)
    - WiFiClientSecure (for HTTPS connections)
 ## ESP32 Firmware Setup 🛠️
 
