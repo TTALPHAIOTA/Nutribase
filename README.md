@@ -179,7 +179,7 @@ const char* serverUrl = "https://your-backend-api.com";
 ### Initial Setup
 1. **Create an account and log in**
 
-2 **Power On Hardware**:
+2. **Power On Hardware**:
    - Connect ESP32 to power source inside the 3D-printed enclosure
    - Ensure LCD display lights up (shows "Nutribase Ready")
 
