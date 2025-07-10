@@ -5,9 +5,9 @@ Nutribase helps you and your roommates track food items in your fridge, monitor 
 
 ## Key Features ✨  
 - **Real-time Weight Tracking** – ESP32 + load sensor logs food weight changes.  
-- **Item Ownership Tags** – See who added what (via RFID/user profiles).  
+- **Item Ownership** – See who added what (via user profiles).  
 - **Roommate Collaboration** – Shared dashboard for households.  
-- **Expiry Alerts** – Notifications for soon-to-expire items.  
+- **Food Item Descriptions** – Showcases weight, price, expiration, time added, and brand. 
 - **3D-Printed Enclosure** – Neatly houses hardware inside your fridge.  
 
 ---
@@ -170,8 +170,28 @@ const char* serverUrl = "https://your-backend-api.com";
 4. Upload to ESP32 via USB.
 
 ## Usage 🚀
-1.Power ESP32 in fridge enclosure
+### Initial Setup
+1.Create an account and log in
 
-2.Calibrate sensor with known weight
+2 **Power On Hardware**:
+   - Connect ESP32 to power source inside the 3D-printed enclosure
+   - Ensure LCD display lights up (shows "Nutribase Ready")
 
-3.View dashboard at http://localhost:3000
+3. **WiFi Connection**:
+   ```text
+   [LCD Display]
+   > WiFi: Connecting...
+   > WiFi: Connected!
+
+4. Go to shared group in settings
+    -Invite users to shared group
+
+###Adding Food Items
+    - Click add food item
+    - Input all forms
+    - Click calibrate weight
+    - Place food on the load cell platform
+    - Wait for weight stabilization (✔️ appears on LCD)
+###NOW ABLE TO VIEW FOOD ITEMS!!
+
+###REPEAT when modifying weight of food item or adding new food item
