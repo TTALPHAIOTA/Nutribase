@@ -167,11 +167,13 @@ npm run dev
 ```
 
 3. Update secrets.h with your credentials:
+```
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
 const char* serverUrl = "https://your-backend-api.com";
+```
 
-4. Upload to ESP32 via USB.
+5. Upload to ESP32 via USB.
 
 ## Usage 🚀
 ### Initial Setup
