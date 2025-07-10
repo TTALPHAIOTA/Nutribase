@@ -156,6 +156,7 @@ void loop() {
     }
   }
 }
+```cpp
 
 # Frontend setup
 cd ../frontend
