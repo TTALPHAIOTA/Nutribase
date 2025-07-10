@@ -20,7 +20,11 @@ Nutribase helps you and your roommates track food items in your fridge, monitor 
   - RFID module (for tagging items/users)  
 - **Display**: LCD with I2C module  
 - **Misc**: Jumper wires, breadboard (3.5" x 2.25"), LED lights  
-- **Enclosure**: 3D-printed case ([STL files](/hardware/enclosure)).  
+- **Enclosure**: 3D-printed case
+- ![image](https://github.com/user-attachments/assets/9104ae17-ffa0-46f5-8ee2-072a0c25709d)
+- ![image](https://github.com/user-attachments/assets/db0b6cff-58c5-421c-89df-65fb364059f8)
+
+ 
 
 ### Wiring Diagram  
 ![Wiring Diagram](https://via.placeholder.com/600x400?text=ESP32+Wiring+Diagram) *[Add Fritzing diagram image]*  
