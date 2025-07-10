@@ -177,7 +177,7 @@ const char* serverUrl = "https://your-backend-api.com";
 
 ## Usage 🚀
 ### Initial Setup
-1.Create an account and log in
+1. **Create an account and log in**
 
 2 **Power On Hardware**:
    - Connect ESP32 to power source inside the 3D-printed enclosure
@@ -189,15 +189,15 @@ const char* serverUrl = "https://your-backend-api.com";
    > WiFi: Connecting...
    > WiFi: Connected!
 
-4. Go to shared group in settings
+4. **Go to shared group in settings**
     -Invite users to shared group
 
-###Adding Food Items
+### Adding Food Items
     - Click add food item
     - Input all forms
     - Click calibrate weight
     - Place food on the load cell platform
     - Wait for weight stabilization (✔️ appears on LCD)
-###NOW ABLE TO VIEW FOOD ITEMS!!
+### NOW ABLE TO VIEW FOOD ITEMS!!
 
-###REPEAT when modifying weight of food item or adding new food item
+### REPEAT when modifying weight of food item or adding new food item
