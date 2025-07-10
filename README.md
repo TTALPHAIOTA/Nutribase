@@ -64,7 +64,30 @@ npm install
 cp .env.example .env  # Configure MongoDB URI
 npm start
 
+### ESP32 Firmware  
+1. Open `/firmware/Nutribase.ino` in Arduino IDE.  
+2. Install required libraries:
+   ```bash
+   # Install these via Arduino Library Manager:
+   - HX711 (for weight sensor)
+   - MFRC522 (for RFID)
+   - WiFiClientSecure (for HTTPS connections)
+
 # Frontend setup
 cd ../frontend
 npm install
 npm run dev
+
+3. Update secrets.h with your credentials:
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+const char* serverUrl = "https://your-backend-api.com";
+
+4. Upload to ESP32 via USB.
+
+## Usage 🚀
+1.Power ESP32 in fridge enclosure
+
+2.Calibrate sensor with known weight
+
+3.View dashboard at http://localhost:3000
