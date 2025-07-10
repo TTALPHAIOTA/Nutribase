@@ -189,7 +189,7 @@ const char* serverUrl = "https://your-backend-api.com";
    > WiFi: Connecting...
    > WiFi: Connected!
 
-4. **Go to shared group in settings**
+4. **Go to shared group in settings**:
     Invite users to shared group
 
 ### Adding Food Items
