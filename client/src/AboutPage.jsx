@@ -39,7 +39,7 @@ export default function AboutPage() {
       </div>
       <div style={{ padding: "24px 0", color: "#2f313e", fontSize: "1.1rem" }}>
         <p>
-          <b>Smart Food Tracker</b> is a fridge tracking app that helps you manage what's in your fridge.
+          <b>Nutribase</b> is a fridge tracking app that helps you manage what's in your fridge.
         </p>
         <br />
         <p>
