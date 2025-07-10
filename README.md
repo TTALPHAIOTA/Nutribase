@@ -89,6 +89,7 @@ cd backend
 npm install
 cp .env.example .env  # Configure MongoDB URI
 npm start
+```
 
 ### ESP32 Firmware  
 1. Open `/firmware/Nutribase.ino` in Arduino IDE.  
