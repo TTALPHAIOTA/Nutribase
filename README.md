@@ -160,9 +160,11 @@ void loop() {
 ```
 
 # Frontend setup
+```bash
 cd ../frontend
 npm install
 npm run dev
+```
 
 3. Update secrets.h with your credentials:
 const char* ssid = "YOUR_WIFI_SSID";
