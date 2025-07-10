@@ -190,7 +190,7 @@ const char* serverUrl = "https://your-backend-api.com";
    > WiFi: Connected!
 
 4. **Go to shared group in settings**
-    -Invite users to shared group
+    Invite users to shared group
 
 ### Adding Food Items
     - Click add food item
@@ -198,6 +198,6 @@ const char* serverUrl = "https://your-backend-api.com";
     - Click calibrate weight
     - Place food on the load cell platform
     - Wait for weight stabilization (✔️ appears on LCD)
-### NOW ABLE TO VIEW FOOD ITEMS!!
+### ⭐NOW ABLE TO VIEW FOOD ITEMS!!⭐
 
-### REPEAT when modifying weight of food item or adding new food item
+### ⭐REPEAT when modifying weight of food item or adding new food item⭐
